@@ -1,0 +1,226 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "schemaVersion": 39,
+  "tags": ["claude-code"],
+  "time": {"from": "now-7d", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Consumption Ratio",
+  "uid": "consumption-ratio",
+  "version": 1,
+  "templating": {"list": []},
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Tokens per 1% Utilization (5-hour window)",
+      "description": "How many tokens correspond to 1% of your 5-hour plan budget. A stable line means your plan quota is consistent. A rising line means more tokens are needed per % point — could indicate caching improvements or quota changes. A dropping line means fewer tokens per % — heavier token types or quota reduction.",
+      "id": 1,
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH hourly_tokens AS ( SELECT date_trunc('hour', m.timestamp) AS hour, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ), hourly_usage AS ( SELECT date_trunc('hour', timestamp) AS hour, AVG(utilization_pct) AS avg_pct FROM usage_snapshots WHERE window_name = 'five_hour' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ) SELECT ht.hour AS time, CASE WHEN hu.avg_pct > 0 THEN ROUND(ht.tokens / hu.avg_pct) ELSE NULL END AS tokens_per_pct FROM hourly_tokens ht JOIN hourly_usage hu ON hu.hour = ht.hour ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tokens per 1% Utilization (7-day window)",
+      "description": "How many tokens correspond to 1% of your 7-day plan budget. More stable than the 5-hour view. Useful for detecting long-term quota changes or shifts in how different token types (input vs output vs cache) affect utilization.",
+      "id": 2,
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH hourly_tokens AS ( SELECT date_trunc('hour', m.timestamp) AS hour, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ), hourly_usage AS ( SELECT date_trunc('hour', timestamp) AS hour, AVG(utilization_pct) AS avg_pct FROM usage_snapshots WHERE window_name = 'seven_day' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ) SELECT ht.hour AS time, CASE WHEN hu.avg_pct > 0 THEN ROUND(ht.tokens / hu.avg_pct) ELSE NULL END AS tokens_per_pct FROM hourly_tokens ht JOIN hourly_usage hu ON hu.hour = ht.hour ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Token Consumption vs 5-hour Utilization",
+      "description": "Overlay of absolute token consumption (left axis) and 5-hour utilization % (right axis). Allows visual correlation — when tokens spike, does utilization spike proportionally? Divergence suggests different token types have different weight on the plan budget.",
+      "id": 3,
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 9},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "tokens"},
+            "properties": [
+              {"id": "unit", "value": "short"},
+              {"id": "decimals", "value": 1},
+              {"id": "custom.axisPlacement", "value": "left"},
+              {"id": "custom.axisLabel", "value": "Tokens"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "utilization_pct"},
+            "properties": [
+              {"id": "unit", "value": "percent"},
+              {"id": "decimals", "value": 1},
+              {"id": "min", "value": 0},
+              {"id": "max", "value": 100},
+              {"id": "custom.axisPlacement", "value": "right"},
+              {"id": "custom.axisLabel", "value": "Utilization %"},
+              {"id": "custom.drawStyle", "value": "line"},
+              {"id": "custom.lineStyle", "value": {"fill": "dash", "dash": [10, 10]}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "mean"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('hour', m.timestamp) AS time, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        },
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('hour', timestamp) AS time, AVG(utilization_pct) AS utilization_pct FROM usage_snapshots WHERE window_name = 'five_hour' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Token Consumption vs 7-day Utilization",
+      "description": "Overlay of absolute token consumption (left axis) and 7-day utilization % (right axis). The 7-day window smooths out short bursts. Useful for identifying sustained consumption patterns and their impact on plan budget.",
+      "id": 4,
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 18},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "tokens"},
+            "properties": [
+              {"id": "unit", "value": "short"},
+              {"id": "decimals", "value": 1},
+              {"id": "custom.axisPlacement", "value": "left"},
+              {"id": "custom.axisLabel", "value": "Tokens"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "utilization_pct"},
+            "properties": [
+              {"id": "unit", "value": "percent"},
+              {"id": "decimals", "value": 1},
+              {"id": "min", "value": 0},
+              {"id": "max", "value": 100},
+              {"id": "custom.axisPlacement", "value": "right"},
+              {"id": "custom.axisLabel", "value": "Utilization %"},
+              {"id": "custom.drawStyle", "value": "line"},
+              {"id": "custom.lineStyle", "value": {"fill": "dash", "dash": [10, 10]}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "mean"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('hour', m.timestamp) AS time, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        },
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('hour', timestamp) AS time, AVG(utilization_pct) AS utilization_pct FROM usage_snapshots WHERE window_name = 'seven_day' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Estimated 5h Budget (tokens)",
+      "description": "Estimated total token budget for the 5-hour window. Calculated as: total tokens consumed in period / average utilization %. Only accurate when utilization data is available.",
+      "id": 5,
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 27},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}, "overrides": []},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH total_tokens AS ( SELECT SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp >= NOW() - INTERVAL '5 hours' ), current_pct AS ( SELECT utilization_pct FROM usage_snapshots WHERE window_name = 'five_hour' ORDER BY timestamp DESC LIMIT 1 ) SELECT CASE WHEN cp.utilization_pct > 0 THEN ROUND(100.0 * tt.tokens / cp.utilization_pct) ELSE NULL END AS estimated_budget FROM total_tokens tt, current_pct cp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Estimated 7d Budget (tokens)",
+      "description": "Estimated total token budget for the 7-day window. Calculated as: total tokens consumed in period / average utilization %. Gives a rough idea of your plan's total capacity.",
+      "id": 6,
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 27},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}, "overrides": []},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH total_tokens AS ( SELECT SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp >= NOW() - INTERVAL '7 days' ), current_pct AS ( SELECT utilization_pct FROM usage_snapshots WHERE window_name = 'seven_day' ORDER BY timestamp DESC LIMIT 1 ) SELECT CASE WHEN cp.utilization_pct > 0 THEN ROUND(100.0 * tt.tokens / cp.utilization_pct) ELSE NULL END AS estimated_budget FROM total_tokens tt, current_pct cp",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
