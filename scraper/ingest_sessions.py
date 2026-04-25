@@ -17,16 +17,15 @@ def discover_jsonl_files(projects_dir):
     return sorted(glob.glob(os.path.join(projects_dir, "**", "*.jsonl"), recursive=True))
 
 
-def extract_project_path_from_filepath(filepath):
-    """Fallback: extract the raw encoded project directory from file path."""
-    parts = filepath.split("/projects/")
-    if len(parts) < 2:
+def extract_project_name_from_cwd(cwd):
+    """Extract project name from the cwd path (last directory component)."""
+    if not cwd:
         return None
-    return parts[1].split("/")[0]
+    return os.path.basename(cwd.rstrip("/")) or None
 
 
-def extract_project_name(filepath):
-    """Extract short project name from path like /data/claude/projects/-Users-alex-Workspace-myproject/...
+def extract_project_name_from_filepath(filepath):
+    """Fallback: extract short project name from encoded file path.
 
     Claude encodes the cwd path by replacing '/' with '-'. The last dash-delimited
     segment of the directory name is used as the project identifier.
@@ -60,7 +59,7 @@ def extract_session_info(filepath):
     }
 
 
-def process_file(conn, filepath, project, project_path, is_subagent, parent_session_id):
+def process_file(conn, filepath, is_subagent, parent_session_id):
     """Process a single JSONL file, reading incrementally from last offset."""
     state = get_scraper_state(conn, filepath)
     last_offset = state["last_offset"]
@@ -110,10 +109,12 @@ def process_file(conn, filepath, project, project_path, is_subagent, parent_sess
             if not last_ts or ts > last_ts:
                 last_ts = ts
 
+            project = extract_project_name_from_cwd(cwd) or extract_project_name_from_filepath(filepath)
+
             upsert_session(conn, {
                 "session_id": session_id,
                 "project": project,
-                "project_path": cwd or project_path,
+                "project_path": cwd,
                 "git_branch": git_branch,
                 "model": model,
                 "started_at": first_ts,
@@ -159,8 +160,6 @@ def main():
     print(f"[ingest_sessions] Found {len(files)} JSONL files")
 
     for filepath in files:
-        project = extract_project_name(filepath)
-        project_path = extract_project_path_from_filepath(filepath)
         info = extract_session_info(filepath)
 
         if info["is_subagent"] and info["parent_session_id"]:
@@ -170,7 +169,7 @@ def main():
                     continue
 
         try:
-            process_file(conn, filepath, project, project_path, info["is_subagent"], info["parent_session_id"])
+            process_file(conn, filepath, info["is_subagent"], info["parent_session_id"])
         except Exception as e:
             print(f"[ingest_sessions] Error processing {filepath}: {e}")
 

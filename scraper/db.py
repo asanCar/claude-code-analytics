@@ -16,6 +16,7 @@ def upsert_session(conn, data):
                 model = COALESCE(EXCLUDED.model, sessions.model),
                 git_branch = COALESCE(EXCLUDED.git_branch, sessions.git_branch),
                 version = COALESCE(EXCLUDED.version, sessions.version),
+                project = EXCLUDED.project,
                 project_path = COALESCE(EXCLUDED.project_path, sessions.project_path)
         """, data)
 
