@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: claude_analytics
+      POSTGRES_USER: claude
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claude -d claude_analytics"]
+      interval: 5s
+      retries: 5
+
+  scraper:
+    build: ./scraper
+    volumes:
+      - ${CLAUDE_DIR:-~/.claude}:/data/claude:ro
+    environment:
+      DATABASE_URL: postgresql://claude:${POSTGRES_PASSWORD}@postgres:5432/claude_analytics
+      CLAUDE_OAUTH_TOKEN: ${CLAUDE_OAUTH_TOKEN:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  grafana_data:
