@@ -6,7 +6,7 @@
   "links": [],
   "schemaVersion": 39,
   "tags": ["claude-code"],
-  "time": {"from": "now-7d", "to": "now"},
+  "time": {"from": "now-30d", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
   "title": "Model Usage",
@@ -20,11 +20,27 @@
       "id": 1,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": true,
+          "calcs": [],
+          "fields": "/^total_tokens$/"
+        },
+        "legend": {"displayMode": "table", "placement": "right", "values": ["value", "percent"]},
+        "tooltip": {"mode": "single"}
+      },
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT t.model, SUM(t.input_tokens + t.output_tokens) AS total_tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND t.model IS NOT NULL GROUP BY t.model",
+          "rawSql": "SELECT t.model, SUM(t.input_tokens + t.output_tokens) AS total_tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND t.model IS NOT NULL GROUP BY t.model ORDER BY total_tokens DESC",
           "refId": "A"
         }
       ]
@@ -37,12 +53,25 @@
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
+          "unit": "short",
+          "decimals": 1,
           "custom": {
-            "stacking": {"mode": "normal"}
+            "stacking": {"mode": "normal"},
+            "fillOpacity": 30
           }
         },
         "overrides": []
       },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["model"]}
+        }
+      ],
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -56,8 +85,30 @@
       "type": "barchart",
       "title": "Model Per Project",
       "id": 3,
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xTickLabelRotation": 0,
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "stacking": "normal",
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["sum"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["model"]}
+        }
+      ],
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -71,8 +122,22 @@
       "type": "barchart",
       "title": "Subagent vs Main",
       "id": 4,
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["sum"]},
+        "tooltip": {"mode": "single"}
+      },
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},

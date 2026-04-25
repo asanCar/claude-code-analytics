@@ -11,6 +11,7 @@ datasources:
     secureJsonData:
       password: $POSTGRES_PASSWORD
     jsonData:
+      database: claude_analytics
       sslmode: disable
       maxOpenConns: 5
       maxIdleConns: 2

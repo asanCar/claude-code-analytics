@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS sessions (
     session_id        TEXT PRIMARY KEY,
     project           TEXT NOT NULL,
+    project_path      TEXT,
     git_branch        TEXT,
     model             TEXT,
     started_at        TIMESTAMPTZ NOT NULL,

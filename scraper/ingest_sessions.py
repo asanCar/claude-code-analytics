@@ -17,8 +17,16 @@ def discover_jsonl_files(projects_dir):
     return sorted(glob.glob(os.path.join(projects_dir, "**", "*.jsonl"), recursive=True))
 
 
+def extract_project_path_from_filepath(filepath):
+    """Fallback: extract the raw encoded project directory from file path."""
+    parts = filepath.split("/projects/")
+    if len(parts) < 2:
+        return None
+    return parts[1].split("/")[0]
+
+
 def extract_project_name(filepath):
-    """Extract project name from path like /data/claude/projects/-Users-alex-Workspace-myproject/...
+    """Extract short project name from path like /data/claude/projects/-Users-alex-Workspace-myproject/...
 
     Claude encodes the cwd path by replacing '/' with '-'. The last dash-delimited
     segment of the directory name is used as the project identifier.
@@ -52,7 +60,7 @@ def extract_session_info(filepath):
     }
 
 
-def process_file(conn, filepath, project, is_subagent, parent_session_id):
+def process_file(conn, filepath, project, project_path, is_subagent, parent_session_id):
     """Process a single JSONL file, reading incrementally from last offset."""
     state = get_scraper_state(conn, filepath)
     last_offset = state["last_offset"]
@@ -65,6 +73,7 @@ def process_file(conn, filepath, project, is_subagent, parent_session_id):
     model = None
     version = None
     git_branch = None
+    cwd = None
     first_ts = None
     last_ts = None
 
@@ -90,6 +99,8 @@ def process_file(conn, filepath, project, is_subagent, parent_session_id):
                 version = meta["version"]
             if meta.get("gitBranch"):
                 git_branch = meta["gitBranch"]
+            if meta.get("cwd") and not cwd:
+                cwd = meta["cwd"]
             if parsed.get("model"):
                 model = parsed["model"]
 
@@ -102,6 +113,7 @@ def process_file(conn, filepath, project, is_subagent, parent_session_id):
             upsert_session(conn, {
                 "session_id": session_id,
                 "project": project,
+                "project_path": cwd or project_path,
                 "git_branch": git_branch,
                 "model": model,
                 "started_at": first_ts,
@@ -148,6 +160,7 @@ def main():
 
     for filepath in files:
         project = extract_project_name(filepath)
+        project_path = extract_project_path_from_filepath(filepath)
         info = extract_session_info(filepath)
 
         if info["is_subagent"] and info["parent_session_id"]:
@@ -157,7 +170,7 @@ def main():
                     continue
 
         try:
-            process_file(conn, filepath, project, info["is_subagent"], info["parent_session_id"])
+            process_file(conn, filepath, project, project_path, info["is_subagent"], info["parent_session_id"])
         except Exception as e:
             print(f"[ingest_sessions] Error processing {filepath}: {e}")
 

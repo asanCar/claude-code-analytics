@@ -9,13 +9,14 @@ def get_connection():
 def upsert_session(conn, data):
     with conn.cursor() as cur:
         cur.execute("""
-            INSERT INTO sessions (session_id, project, git_branch, model, started_at, ended_at, version, is_subagent, parent_session_id)
-            VALUES (%(session_id)s, %(project)s, %(git_branch)s, %(model)s, %(started_at)s, %(ended_at)s, %(version)s, %(is_subagent)s, %(parent_session_id)s)
+            INSERT INTO sessions (session_id, project, project_path, git_branch, model, started_at, ended_at, version, is_subagent, parent_session_id)
+            VALUES (%(session_id)s, %(project)s, %(project_path)s, %(git_branch)s, %(model)s, %(started_at)s, %(ended_at)s, %(version)s, %(is_subagent)s, %(parent_session_id)s)
             ON CONFLICT (session_id) DO UPDATE SET
                 ended_at = GREATEST(sessions.ended_at, EXCLUDED.ended_at),
                 model = COALESCE(EXCLUDED.model, sessions.model),
                 git_branch = COALESCE(EXCLUDED.git_branch, sessions.git_branch),
-                version = COALESCE(EXCLUDED.version, sessions.version)
+                version = COALESCE(EXCLUDED.version, sessions.version),
+                project_path = COALESCE(EXCLUDED.project_path, sessions.project_path)
         """, data)
 
 

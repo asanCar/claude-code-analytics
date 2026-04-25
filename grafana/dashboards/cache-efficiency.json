@@ -6,7 +6,7 @@
   "links": [],
   "schemaVersion": 39,
   "tags": ["claude-code"],
-  "time": {"from": "now-7d", "to": "now"},
+  "time": {"from": "now-30d", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
   "title": "Cache Efficiency",
@@ -21,8 +21,18 @@
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
-        "defaults": {"custom": {}},
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100,
+          "custom": {}
+        },
         "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "tooltip": {"mode": "single"}
       },
       "targets": [
         {
@@ -41,11 +51,18 @@
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
+          "unit": "short",
+          "decimals": 1,
           "custom": {
-            "stacking": {"mode": "normal"}
+            "stacking": {"mode": "normal"},
+            "fillOpacity": 30
           }
         },
         "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
       },
       "targets": [
         {
@@ -62,6 +79,14 @@
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {"unit": "short", "decimals": 1},
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "single"}
+      },
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -77,6 +102,14 @@
       "id": 4,
       "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "cache_hit_pct"}, "properties": [{"id": "unit", "value": "percent"}, {"id": "decimals", "value": 1}]},
+          {"matcher": {"id": "byName", "options": "total_cache_read"}, "properties": [{"id": "unit", "value": "short"}, {"id": "decimals", "value": 1}]},
+          {"matcher": {"id": "byName", "options": "total_fresh_input"}, "properties": [{"id": "unit", "value": "short"}, {"id": "decimals", "value": 1}]}
+        ]
+      },
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
