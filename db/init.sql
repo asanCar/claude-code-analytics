@@ -32,8 +32,8 @@ CREATE TABLE IF NOT EXISTS token_usage (
 
 CREATE TABLE IF NOT EXISTS usage_snapshots (
     id              SERIAL PRIMARY KEY,
-    timestamp       TIMESTAMPTZ NOT NULL,
-    window          TEXT NOT NULL,
+    "timestamp"     TIMESTAMPTZ NOT NULL,
+    window_name     TEXT NOT NULL,
     utilization_pct REAL NOT NULL,
     resets_at       TIMESTAMPTZ,
     plan            TEXT
