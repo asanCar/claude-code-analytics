@@ -88,9 +88,9 @@
       ]
     },
     {
-      "type": "piechart",
-      "title": "Cost by Prompt Type",
-      "description": "Token distribution across prompt types. Quick view of how tokens split between human input, tool use, tool results, and assistant responses.",
+      "type": "barchart",
+      "title": "Average Tokens per Message by Prompt Type",
+      "description": "Identifies which interaction types are most expensive per message. Only assistant_text and tool_use have token data — the cost of human_input and tool_result is included in the subsequent assistant response's input_tokens.",
       "id": 4,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -99,19 +99,52 @@
         "overrides": []
       },
       "options": {
-        "reduceOptions": {
-          "values": true,
-          "calcs": [],
-          "fields": "/^tokens$/"
-        },
-        "legend": {"displayMode": "table", "placement": "right", "values": ["value", "percent"]},
+        "orientation": "horizontal",
+        "barWidth": 0.7,
+        "legend": {"displayMode": "list", "placement": "bottom"},
         "tooltip": {"mode": "single"}
       },
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT m.prompt_type, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY m.prompt_type",
+          "rawSql": "SELECT m.prompt_type, ROUND(AVG(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens)) AS avg_tokens FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY m.prompt_type ORDER BY avg_tokens DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Average Tokens per Message Over Time",
+      "description": "Trend of per-message cost by prompt type. Rising lines mean individual messages are getting more expensive (heavier tool calls, larger files). Flat lines with increasing volume (see Overview) means you're just doing more of the same work.",
+      "id": 5,
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 28},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["prompt_type"]}
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, m.prompt_type, ROUND(AVG(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens)) AS avg_tokens FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
           "refId": "A"
         }
       ]
