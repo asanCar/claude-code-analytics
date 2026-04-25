@@ -21,7 +21,7 @@
         "multi": true,
         "includeAll": true,
         "current": {"text": "All", "value": "$__all"},
-        "datasource": {"type": "postgres", "uid": "postgresql"},
+        "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
         "hide": 0
       }
     ]
@@ -32,13 +32,13 @@
       "title": "Token Consumption by Project",
       "id": 1,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "options": {
         "orientation": "horizontal"
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT s.project, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS total_tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid JOIN sessions s ON s.session_id = m.session_id WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY s.project ORDER BY total_tokens DESC LIMIT 10",
           "refId": "A"
@@ -50,7 +50,7 @@
       "title": "Project Activity Over Time",
       "id": 2,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -61,7 +61,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, s.project, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid JOIN sessions s ON s.session_id = m.session_id WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
           "refId": "A"
@@ -73,10 +73,10 @@
       "title": "Sessions Per Project",
       "id": 3,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 16},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT s.project, COUNT(DISTINCT s.session_id) AS sessions, SUM(t.input_tokens + t.output_tokens) AS total_tokens, MIN(s.started_at) AS first_session, MAX(s.started_at) AS last_session FROM sessions s JOIN messages m ON m.session_id = s.session_id JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE s.started_at BETWEEN $__timeFrom() AND $__timeTo() AND s.is_subagent = false GROUP BY s.project ORDER BY total_tokens DESC",
           "refId": "A"

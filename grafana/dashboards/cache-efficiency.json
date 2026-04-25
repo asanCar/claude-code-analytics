@@ -19,14 +19,14 @@
       "title": "Cache Hit Ratio Over Time",
       "id": 1,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {"custom": {}},
         "overrides": []
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, CASE WHEN SUM(t.cache_read_tokens + t.input_tokens) = 0 THEN 0 ELSE 100.0 * SUM(t.cache_read_tokens) / SUM(t.cache_read_tokens + t.input_tokens) END AS cache_hit_pct FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
           "refId": "A"
@@ -38,7 +38,7 @@
       "title": "Cache Read vs Fresh Input",
       "id": 2,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -49,7 +49,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, SUM(t.cache_read_tokens) AS cache_read, SUM(t.input_tokens) AS fresh_input FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
           "refId": "A"
@@ -61,10 +61,10 @@
       "title": "Cache Creation Tokens Per Day",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, SUM(t.cache_creation_tokens) AS cache_creation FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
           "refId": "A"
@@ -76,10 +76,10 @@
       "title": "Most Cache-Efficient Projects",
       "id": 4,
       "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT s.project, CASE WHEN SUM(t.cache_read_tokens + t.input_tokens) = 0 THEN 0 ELSE 100.0 * SUM(t.cache_read_tokens) / SUM(t.cache_read_tokens + t.input_tokens) END AS cache_hit_pct, SUM(t.cache_read_tokens) AS total_cache_read, SUM(t.input_tokens) AS total_fresh_input FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid JOIN sessions s ON s.session_id = m.session_id WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY s.project ORDER BY cache_hit_pct DESC",
           "refId": "A"

@@ -64,10 +64,10 @@
       "title": "Most Expensive Prompts",
       "id": 1,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT LEFT(m.prompt_text, 100) AS prompt, t.model, t.input_tokens, t.output_tokens, t.cache_read_tokens, t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens AS total_tokens, m.timestamp FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY total_tokens DESC LIMIT 50",
           "refId": "A"
@@ -79,10 +79,10 @@
       "title": "Most Expensive Sessions",
       "id": 2,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 10},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT s.session_id, s.project, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS total_tokens, COUNT(m.message_uuid) AS messages, s.started_at FROM sessions s JOIN messages m ON m.session_id = s.session_id JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE s.started_at BETWEEN $__timeFrom() AND $__timeTo() AND s.is_subagent = false GROUP BY s.session_id, s.project, s.started_at ORDER BY total_tokens DESC LIMIT 20",
           "refId": "A"
@@ -94,10 +94,10 @@
       "title": "Most Expensive Tools",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT m.tool_name, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND m.tool_name IS NOT NULL GROUP BY m.tool_name ORDER BY tokens DESC",
           "refId": "A"
@@ -109,10 +109,10 @@
       "title": "Cost by Prompt Type",
       "id": 4,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT m.prompt_type, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY m.prompt_type",
           "refId": "A"

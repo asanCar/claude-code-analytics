@@ -64,7 +64,7 @@
       "title": "Tokens Over Time",
       "id": 1,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -75,7 +75,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, SUM(t.input_tokens) AS input, SUM(t.output_tokens) AS output, SUM(t.cache_read_tokens) AS cache_read, SUM(t.cache_creation_tokens) AS cache_creation FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
           "refId": "A"
@@ -87,10 +87,10 @@
       "title": "Daily Active Sessions",
       "id": 2,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', started_at) AS time, COUNT(*) AS sessions FROM sessions WHERE started_at BETWEEN $__timeFrom() AND $__timeTo() AND is_subagent = false GROUP BY 1 ORDER BY 1",
           "refId": "A"
@@ -102,7 +102,7 @@
       "title": "Usage Utilization Trend",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -111,7 +111,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT timestamp AS time, utilization_pct, window_name FROM usage_snapshots WHERE window_name IN ('five_hour', 'seven_day') AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY 1",
           "refId": "A"
@@ -123,10 +123,10 @@
       "title": "Current Plan",
       "id": 4,
       "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT plan FROM usage_snapshots ORDER BY timestamp DESC LIMIT 1",
           "refId": "A"

@@ -18,14 +18,14 @@
         "name": "project",
         "type": "query",
         "query": "SELECT DISTINCT project FROM sessions ORDER BY project",
-        "datasource": {"type": "postgres", "uid": "postgresql"},
+        "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
         "hide": 0
       },
       {
         "name": "session",
         "type": "query",
         "query": "SELECT session_id AS __value, session_id || ' (' || started_at::date || ')' AS __text FROM sessions WHERE project = '$project' AND is_subagent = false ORDER BY started_at DESC",
-        "datasource": {"type": "postgres", "uid": "postgresql"},
+        "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
         "hide": 0
       }
     ]
@@ -36,10 +36,10 @@
       "title": "Prompt List",
       "id": 1,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT m.timestamp, m.prompt_type, m.tool_name, LEFT(m.prompt_text, 120) AS prompt_preview, COALESCE(t.input_tokens, 0) AS input, COALESCE(t.output_tokens, 0) AS output, COALESCE(t.cache_read_tokens, 0) AS cache_read FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session' ORDER BY m.timestamp",
           "refId": "A"
@@ -51,10 +51,10 @@
       "title": "Total Input Tokens",
       "id": 2,
       "gridPos": {"h": 4, "w": 6, "x": 0, "y": 10},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT SUM(t.input_tokens) AS total_input FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session'",
           "refId": "A"
@@ -66,10 +66,10 @@
       "title": "Total Output Tokens",
       "id": 3,
       "gridPos": {"h": 4, "w": 6, "x": 6, "y": 10},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT SUM(t.output_tokens) AS total_output FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session'",
           "refId": "A"
@@ -81,10 +81,10 @@
       "title": "Total Cache Read Tokens",
       "id": 4,
       "gridPos": {"h": 4, "w": 6, "x": 12, "y": 10},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT SUM(t.cache_read_tokens) AS total_cache_read FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session'",
           "refId": "A"
@@ -96,10 +96,10 @@
       "title": "Message Count",
       "id": 5,
       "gridPos": {"h": 4, "w": 6, "x": 18, "y": 10},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT COUNT(m.message_uuid) AS message_count FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session'",
           "refId": "A"
@@ -111,14 +111,14 @@
       "title": "Session Timeline",
       "id": 6,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {"custom": {}},
         "overrides": []
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT m.timestamp AS time, m.prompt_type, COALESCE(t.input_tokens, 0) + COALESCE(t.output_tokens, 0) AS tokens FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session' ORDER BY m.timestamp",
           "refId": "A"

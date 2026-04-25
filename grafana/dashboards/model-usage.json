@@ -19,10 +19,10 @@
       "title": "Token Split by Model",
       "id": 1,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT t.model, SUM(t.input_tokens + t.output_tokens) AS total_tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND t.model IS NOT NULL GROUP BY t.model",
           "refId": "A"
@@ -34,7 +34,7 @@
       "title": "Model Usage Over Time",
       "id": 2,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -45,7 +45,7 @@
       },
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, t.model, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND t.model IS NOT NULL GROUP BY 1, 2 ORDER BY 1",
           "refId": "A"
@@ -57,10 +57,10 @@
       "title": "Model Per Project",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT s.project, t.model, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid JOIN sessions s ON s.session_id = m.session_id WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND t.model IS NOT NULL GROUP BY 1, 2 ORDER BY tokens DESC",
           "refId": "A"
@@ -72,10 +72,10 @@
       "title": "Subagent vs Main",
       "id": 4,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
-      "datasource": {"type": "postgres", "uid": "postgresql"},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
-          "datasource": {"type": "postgres", "uid": "postgresql"},
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT CASE WHEN s.is_subagent THEN 'Subagent' ELSE 'Main' END AS session_type, SUM(t.input_tokens + t.output_tokens) AS tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid JOIN sessions s ON s.session_id = m.session_id WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1",
           "refId": "A"
