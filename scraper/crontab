@@ -1,0 +1,2 @@
+*/5 * * * * python /app/ingest_sessions.py >> /proc/1/fd/1 2>&1
+*/5 * * * * python /app/ingest_usage.py >> /proc/1/fd/1 2>&1
