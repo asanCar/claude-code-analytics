@@ -12,20 +12,12 @@
   "title": "Overview",
   "uid": "overview",
   "version": 1,
-  "templating": {
-    "list": [
-      {"name": "input_price_opus", "type": "constant", "current": {"value": "5"}, "label": "Opus Input $/MTok", "hide": 0},
-      {"name": "output_price_opus", "type": "constant", "current": {"value": "25"}, "label": "Opus Output $/MTok", "hide": 0},
-      {"name": "input_price_sonnet", "type": "constant", "current": {"value": "3"}, "label": "Sonnet Input $/MTok", "hide": 0},
-      {"name": "output_price_sonnet", "type": "constant", "current": {"value": "15"}, "label": "Sonnet Output $/MTok", "hide": 0},
-      {"name": "input_price_haiku", "type": "constant", "current": {"value": "1"}, "label": "Haiku Input $/MTok", "hide": 0},
-      {"name": "output_price_haiku", "type": "constant", "current": {"value": "5"}, "label": "Haiku Output $/MTok", "hide": 0}
-    ]
-  },
+  "templating": {"list": []},
   "panels": [
     {
       "type": "timeseries",
       "title": "Tokens Over Time",
+      "description": "Daily token consumption broken down by type (input, output, cache read, cache creation). Stacked view shows total volume and composition trends.",
       "id": 1,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -56,6 +48,7 @@
     {
       "type": "barchart",
       "title": "Daily Active Sessions",
+      "description": "Number of distinct Claude Code sessions per day, excluding subagents. Useful for correlating usage spikes with workload.",
       "id": 2,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -79,6 +72,7 @@
     {
       "type": "timeseries",
       "title": "Usage Utilization Trend",
+      "description": "Percentage of your plan's rate limit consumed over 5-hour and 7-day rolling windows. Approaching 100% means you'll hit throttling.",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -114,6 +108,7 @@
     {
       "type": "stat",
       "title": "Current Plan",
+      "description": "Your detected Claude plan (PRO, MAX5, MAX20). Derived from the latest OAuth API poll.",
       "id": 4,
       "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},

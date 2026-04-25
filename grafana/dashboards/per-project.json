@@ -30,6 +30,7 @@
     {
       "type": "barchart",
       "title": "Token Consumption by Project",
+      "description": "Top 10 projects ranked by total tokens. Identifies which codebases drive the most usage.",
       "id": 1,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -55,6 +56,7 @@
     {
       "type": "timeseries",
       "title": "Project Activity Over Time",
+      "description": "Daily token consumption stacked by project. Reveals which projects are active and when.",
       "id": 2,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -91,6 +93,7 @@
     {
       "type": "table",
       "title": "Sessions Per Project",
+      "description": "Summary table with session count, total tokens, and date range per project. Full path shown in project_path column.",
       "id": 3,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 16},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},

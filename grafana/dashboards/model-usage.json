@@ -17,6 +17,7 @@
     {
       "type": "piechart",
       "title": "Token Split by Model",
+      "description": "Proportion of tokens consumed by each Claude model. Shows whether you're using Opus, Sonnet, or Haiku more.",
       "id": 1,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -48,6 +49,7 @@
     {
       "type": "timeseries",
       "title": "Model Usage Over Time",
+      "description": "Daily token consumption stacked by model. Reveals shifts in model usage patterns.",
       "id": 2,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -84,6 +86,7 @@
     {
       "type": "barchart",
       "title": "Model Per Project",
+      "description": "Which models are used in which projects. Useful for identifying projects that rely on more expensive models.",
       "id": 3,
       "gridPos": {"h": 10, "w": 12, "x": 0, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -121,6 +124,7 @@
     {
       "type": "barchart",
       "title": "Subagent vs Main",
+      "description": "Token consumption split between main sessions and subagents. High subagent usage indicates heavy parallel/delegated work.",
       "id": 4,
       "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},

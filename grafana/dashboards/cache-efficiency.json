@@ -17,6 +17,7 @@
     {
       "type": "timeseries",
       "title": "Cache Hit Ratio Over Time",
+      "description": "Percentage of input tokens served from cache. Higher is better — means less redundant context being sent.",
       "id": 1,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -46,6 +47,7 @@
     {
       "type": "timeseries",
       "title": "Cache Read vs Fresh Input",
+      "description": "Absolute volume of cached vs fresh tokens. Shows the raw savings from prompt caching.",
       "id": 2,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -76,6 +78,7 @@
     {
       "type": "barchart",
       "title": "Cache Creation Tokens Per Day",
+      "description": "Tokens spent creating new cache entries. High values indicate many new/unique prompts entering the cache.",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -99,6 +102,7 @@
     {
       "type": "table",
       "title": "Most Cache-Efficient Projects",
+      "description": "Projects ranked by cache hit ratio. Low-ratio projects may benefit from prompt restructuring.",
       "id": 4,
       "gridPos": {"h": 10, "w": 12, "x": 12, "y": 8},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},

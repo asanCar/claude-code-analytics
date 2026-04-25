@@ -12,20 +12,12 @@
   "title": "Prompt Cost Ranking",
   "uid": "prompt-cost",
   "version": 1,
-  "templating": {
-    "list": [
-      {"name": "input_price_opus", "type": "constant", "current": {"value": "5"}, "label": "Opus Input $/MTok", "hide": 0},
-      {"name": "output_price_opus", "type": "constant", "current": {"value": "25"}, "label": "Opus Output $/MTok", "hide": 0},
-      {"name": "input_price_sonnet", "type": "constant", "current": {"value": "3"}, "label": "Sonnet Input $/MTok", "hide": 0},
-      {"name": "output_price_sonnet", "type": "constant", "current": {"value": "15"}, "label": "Sonnet Output $/MTok", "hide": 0},
-      {"name": "input_price_haiku", "type": "constant", "current": {"value": "1"}, "label": "Haiku Input $/MTok", "hide": 0},
-      {"name": "output_price_haiku", "type": "constant", "current": {"value": "5"}, "label": "Haiku Output $/MTok", "hide": 0}
-    ]
-  },
+  "templating": {"list": []},
   "panels": [
     {
       "type": "table",
       "title": "Most Expensive Prompts",
+      "description": "Individual messages ranked by total tokens. Identifies the single most expensive interactions.",
       "id": 1,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -50,6 +42,7 @@
     {
       "type": "table",
       "title": "Most Expensive Sessions",
+      "description": "Sessions ranked by total tokens consumed. Highlights which conversations cost the most.",
       "id": 2,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 10},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -71,6 +64,7 @@
     {
       "type": "barchart",
       "title": "Top 10 Most Expensive Tools",
+      "description": "Tools ranked by total tokens. Shows whether Read, Bash, Write, or other tools drive the most usage.",
       "id": 3,
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -96,6 +90,7 @@
     {
       "type": "piechart",
       "title": "Cost by Prompt Type",
+      "description": "Token distribution across prompt types. Quick view of how tokens split between human input, tool use, tool results, and assistant responses.",
       "id": 4,
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
