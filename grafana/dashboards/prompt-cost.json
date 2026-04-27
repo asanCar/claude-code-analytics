@@ -124,7 +124,7 @@
     {
       "type": "timeseries",
       "title": "Average Tokens per Message Over Time",
-      "description": "Trend of per-message cost by prompt type. Rising lines mean individual messages are getting more expensive (heavier tool calls, larger files). Flat lines with increasing volume (see Overview) means you're just doing more of the same work.",
+      "description": "Average tokens per message, by prompt type, day by day. Rising lines mean individual interactions are getting more expensive:\n\n- `assistant_text` rising = longer answers or bigger context fed in\n- `tool_use` rising = Claude is reading larger files or running heavier commands\n\nNote: only `assistant_text` and `tool_use` appear here — those are the only messages with their own token usage. The cost of `human_input` and `tool_result` is bundled into the next assistant message's input tokens.",
       "id": 5,
       "gridPos": {"h": 9, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},

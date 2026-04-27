@@ -32,11 +32,83 @@
   },
   "panels": [
     {
+      "type": "stat",
+      "title": "human_input",
+      "description": "User-typed prompts — the text you write in the Claude Code CLI.",
+      "id": 7,
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS messages FROM messages WHERE session_id = '$session' AND prompt_type = 'human_input'",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "assistant_text",
+      "description": "Claude's natural-language replies and reasoning text.",
+      "id": 8,
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "fixed", "fixedColor": "green"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS messages FROM messages WHERE session_id = '$session' AND prompt_type = 'assistant_text'",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "tool_use",
+      "description": "Claude invoking a tool (Read, Write, Edit, Bash, Grep, Glob, etc.). Stored as tool name plus a brief argument summary.",
+      "id": 9,
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "fixed", "fixedColor": "orange"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS messages FROM messages WHERE session_id = '$session' AND prompt_type = 'tool_use'",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "tool_result",
+      "description": "Output a tool returns back to Claude. Stored as tool name plus the first 200 chars of output.",
+      "id": 10,
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "fixed", "fixedColor": "purple"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS messages FROM messages WHERE session_id = '$session' AND prompt_type = 'tool_result'",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "type": "table",
       "title": "Prompt List",
       "description": "Chronological message log for the selected session. Shows each prompt/response with its token cost.",
       "id": 1,
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 4},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {},
@@ -60,7 +132,7 @@
       "title": "Total Input Tokens",
       "description": "Aggregate input tokens for the selected session.",
       "id": 2,
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 10},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 14},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 1}, "overrides": []},
       "targets": [
@@ -77,7 +149,7 @@
       "title": "Total Output Tokens",
       "description": "Aggregate output tokens for the selected session.",
       "id": 3,
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 10},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 14},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 1}, "overrides": []},
       "targets": [
@@ -94,7 +166,7 @@
       "title": "Total Cache Read Tokens",
       "description": "Aggregate cache read tokens for the selected session.",
       "id": 4,
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 10},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 14},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 1}, "overrides": []},
       "targets": [
@@ -111,7 +183,7 @@
       "title": "Message Count",
       "description": "Total number of messages in the selected session.",
       "id": 5,
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 10},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 14},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}, "overrides": []},
       "targets": [
@@ -126,25 +198,60 @@
     {
       "type": "timeseries",
       "title": "Session Timeline",
-      "description": "Token consumption over time within a single session, colored by prompt type. Spikes indicate expensive tool calls.",
+      "description": "Per-prompt token consumption as bars (left axis) with cumulative token consumption over time as lines (right axis). Bars show the tokens used by each individual prompt; lines show the running total per prompt type.",
       "id": 6,
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
+      "gridPos": {"h": 14, "w": 24, "x": 0, "y": 18},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 1,
-          "custom": {}
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "showPoints": "auto",
+            "spanNulls": true,
+            "axisPlacement": "right",
+            "axisLabel": "Cumulative tokens"
+          }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "cumulative"},
+            "properties": [
+              {"id": "displayName", "value": "Σ ${__series.name}"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "per_prompt"},
+            "properties": [
+              {"id": "custom.drawStyle", "value": "bars"},
+              {"id": "custom.fillOpacity", "value": 70},
+              {"id": "custom.lineWidth", "value": 10},
+              {"id": "custom.barAlignment", "value": 0},
+              {"id": "custom.axisPlacement", "value": "left"},
+              {"id": "custom.axisLabel", "value": "Per-prompt tokens"},
+              {"id": "displayName", "value": "▮ ${__series.name}"},
+              {"id": "custom.hideFrom", "value": {"legend": true, "tooltip": false, "viz": false}}
+            ]
+          }
+        ]
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum"]},
-        "tooltip": {"mode": "multi", "sort": "desc"}
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "max"]},
+        "tooltip": {"mode": "multi", "sort": "asc"}
       },
       "transformations": [
         {
           "id": "partitionByValues",
+          "filter": {"id": "byRefId", "options": "A"},
+          "options": {"fields": ["prompt_type"]}
+        },
+        {
+          "id": "partitionByValues",
+          "filter": {"id": "byRefId", "options": "B"},
           "options": {"fields": ["prompt_type"]}
         }
       ],
@@ -152,7 +259,13 @@
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT m.timestamp AS time, m.prompt_type, COALESCE(t.input_tokens, 0) + COALESCE(t.output_tokens, 0) AS tokens FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session' ORDER BY m.timestamp",
+          "rawSql": "SELECT m.timestamp AS time, m.prompt_type, COALESCE(t.input_tokens, 0) + COALESCE(t.output_tokens, 0) AS per_prompt FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session' ORDER BY m.timestamp",
+          "refId": "B"
+        },
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT m.timestamp AS time, m.prompt_type, SUM(COALESCE(t.input_tokens, 0) + COALESCE(t.output_tokens, 0)) OVER (PARTITION BY m.prompt_type ORDER BY m.timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative FROM messages m LEFT JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.session_id = '$session' ORDER BY m.timestamp",
           "refId": "A"
         }
       ]
