@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Poll Anthropic OAuth usage API and store utilization snapshots."""
-import os
 from datetime import datetime, timezone
 
 import requests
@@ -10,14 +9,24 @@ from db import get_connection, insert_usage_snapshot
 USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 API_USER_AGENT = "claude-code/2.0.32"
 API_BETA = "oauth-2025-04-20"
+TOKEN_FILE = "/run/secrets/claude_token"
 
 WINDOWS = ["five_hour", "seven_day", "seven_day_opus", "seven_day_sonnet"]
+
+
+def read_token():
+    """Read OAuth access token from the mounted secret file."""
+    try:
+        with open(TOKEN_FILE) as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return ""
 
 
 def fetch_usage(token):
     """Fetch usage data from Anthropic OAuth API. Returns dict or None on failure."""
     if not token:
-        print("[ingest_usage] No CLAUDE_OAUTH_TOKEN set, skipping")
+        print(f"[ingest_usage] No token at {TOKEN_FILE}, skipping")
         return None
     try:
         resp = requests.get(
@@ -68,7 +77,7 @@ def ingest_snapshots(conn, api_data, plan):
 
 def main():
     print(f"[ingest_usage] {datetime.now(timezone.utc).isoformat()}")
-    token = os.environ.get("CLAUDE_OAUTH_TOKEN", "").strip()
+    token = read_token()
     data = fetch_usage(token)
     if data is None:
         return

@@ -1,7 +1,6 @@
 services:
   postgres:
-    # image: postgres:16-alpine
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -20,9 +19,9 @@ services:
     build: ./scraper
     volumes:
       - ${CLAUDE_DIR:-~/.claude}:/data/claude:ro
+      - ./scraper/.token:/run/secrets/claude_token:ro
     environment:
       DATABASE_URL: postgresql://claude:${POSTGRES_PASSWORD}@postgres:5432/claude_analytics
-      CLAUDE_OAUTH_TOKEN: ${CLAUDE_OAUTH_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy
