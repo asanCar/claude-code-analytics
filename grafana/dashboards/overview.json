@@ -17,20 +17,55 @@
     {
       "type": "timeseries",
       "title": "Tokens Over Time",
-      "description": "Daily token consumption broken down by type (input, output, cache read, cache creation). Stacked view shows total volume and composition trends.",
+      "description": "Daily token consumption broken down by type. Stacked bars show composition; the line on top shows the daily total.\n\n- **Input** — new tokens sent to Claude in this turn (content beyond what was already cached).\n- **Output** — tokens Claude generated in its response.\n- **Cache read** — tokens served from prompt cache (cheap; reused context).\n- **Cache creation** — tokens written into prompt cache (one-time cost; amortized across subsequent reads).\n- **Total** — sum of input + output + cache read + cache creation per day.",
       "id": 1,
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 1,
           "custom": {
+            "drawStyle": "bars",
             "stacking": {"mode": "normal"},
-            "fillOpacity": 30
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "total"},
+            "properties": [
+              {"id": "custom.drawStyle", "value": "line"},
+              {"id": "custom.stacking", "value": {"mode": "none"}},
+              {"id": "custom.lineWidth", "value": 3},
+              {"id": "custom.fillOpacity", "value": 0},
+              {"id": "custom.lineInterpolation", "value": "linear"},
+              {"id": "custom.showPoints", "value": "always"},
+              {"id": "custom.hideFrom", "value": {"legend": false, "tooltip": false, "viz": false}},
+              {"id": "displayName", "value": "Total (all token types)"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "purple"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "input"},
+            "properties": [{"id": "displayName", "value": "Input (new tokens sent)"}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "output"},
+            "properties": [{"id": "displayName", "value": "Output (tokens generated)"}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "cache_read"},
+            "properties": [{"id": "displayName", "value": "Cache read (served from cache)"}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "cache_creation"},
+            "properties": [{"id": "displayName", "value": "Cache creation (written to cache)"}]
+          }
+        ]
       },
       "options": {
         "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "mean"], "sortBy": "Total", "sortDesc": true},
@@ -40,7 +75,7 @@
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, SUM(t.input_tokens) AS input, SUM(t.output_tokens) AS output, SUM(t.cache_creation_tokens) AS cache_creation, SUM(t.cache_read_tokens) AS cache_read FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "rawSql": "SELECT date_trunc('day', m.timestamp, 'Europe/Madrid') AS time, SUM(t.input_tokens) AS input, SUM(t.output_tokens) AS output, SUM(t.cache_creation_tokens) AS cache_creation, SUM(t.cache_read_tokens) AS cache_read, SUM(t.input_tokens + t.output_tokens + t.cache_creation_tokens + t.cache_read_tokens) AS total FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
           "refId": "A"
         }
       ]
@@ -50,7 +85,7 @@
       "title": "Daily Active Sessions",
       "description": "Number of distinct Claude Code sessions per day, excluding subagents. Useful for correlating usage spikes with workload.",
       "id": 2,
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {"unit": "short", "decimals": 0},
@@ -74,7 +109,7 @@
       "title": "Usage Utilization Trend",
       "description": "Percentage of your plan's rate limit consumed over 5-hour and 7-day rolling windows. Approaching 100% means you'll hit throttling.",
       "id": 3,
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {
@@ -110,7 +145,7 @@
       "title": "Current Plan",
       "description": "Your detected Claude plan (PRO, MAX5, MAX20). Derived from the latest OAuth API poll.",
       "id": 4,
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 20},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "targets": [
         {
