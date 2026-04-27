@@ -6,7 +6,7 @@
   "links": [],
   "schemaVersion": 39,
   "tags": ["claude-code"],
-  "time": {"from": "now-30d", "to": "now"},
+  "time": {"from": "now-7d", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
   "title": "Overview",
@@ -33,14 +33,14 @@
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "mean"]},
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "mean"], "sortBy": "Total", "sortDesc": true},
         "tooltip": {"mode": "multi", "sort": "desc"}
       },
       "targets": [
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, SUM(t.input_tokens) AS input, SUM(t.output_tokens) AS output, SUM(t.cache_read_tokens) AS cache_read, SUM(t.cache_creation_tokens) AS cache_creation FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, SUM(t.input_tokens) AS input, SUM(t.output_tokens) AS output, SUM(t.cache_creation_tokens) AS cache_creation, SUM(t.cache_read_tokens) AS cache_read FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
           "refId": "A"
         }
       ]
