@@ -11,7 +11,7 @@
     <key>RunAtLoad</key>
     <true/>
     <key>StartInterval</key>
-    <integer>1800</integer>
+    <integer>60</integer>
     <key>StandardOutPath</key>
     <string>/tmp/claude-code-analytics-token-sync.log</string>
     <key>StandardErrorPath</key>

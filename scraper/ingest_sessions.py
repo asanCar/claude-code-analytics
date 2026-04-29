@@ -68,7 +68,8 @@ def process_file(conn, filepath, is_subagent, parent_session_id):
     if file_size <= last_offset:
         return
 
-    session_id = None
+    file_session_id = extract_session_info(filepath)["file_session_id"]
+    session_id = file_session_id if is_subagent else None
     model = None
     version = None
     git_branch = None
@@ -93,7 +94,7 @@ def process_file(conn, filepath, is_subagent, parent_session_id):
 
             meta = parsed.get("session_meta", {})
             if not session_id:
-                session_id = meta.get("sessionId") or extract_session_info(filepath)["file_session_id"]
+                session_id = meta.get("sessionId") or file_session_id
             if meta.get("version"):
                 version = meta["version"]
             if meta.get("gitBranch"):

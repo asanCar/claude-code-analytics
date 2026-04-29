@@ -108,8 +108,13 @@
       },
       "transformations": [
         {
-          "id": "partitionByValues",
-          "options": {"fields": ["model"]}
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "model",
+            "rowField": "project",
+            "valueField": "tokens",
+            "emptyValue": "zero"
+          }
         }
       ],
       "targets": [

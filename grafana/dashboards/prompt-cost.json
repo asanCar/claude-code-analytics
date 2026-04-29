@@ -124,7 +124,7 @@
     {
       "type": "timeseries",
       "title": "Average Tokens per Message Over Time",
-      "description": "Average tokens per message, by prompt type, day by day. Rising lines mean individual interactions are getting more expensive:\n\n- `assistant_text` rising = longer answers or bigger context fed in\n- `tool_use` rising = Claude is reading larger files or running heavier commands\n\nNote: only `assistant_text` and `tool_use` appear here — those are the only messages with their own token usage. The cost of `human_input` and `tool_result` is bundled into the next assistant message's input tokens.",
+      "description": "Average tokens per message, by prompt type, day by day. Rising bars mean individual interactions are getting more expensive:\n\n- `assistant_text` rising = longer answers or bigger context fed in\n- `tool_use` rising = Claude is reading larger files or running heavier commands\n\nNote: only `assistant_text` and `tool_use` appear here — those are the only messages with their own token usage. The cost of `human_input` and `tool_result` is bundled into the next assistant message's input tokens.",
       "id": 5,
       "gridPos": {"h": 9, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -133,7 +133,11 @@
           "unit": "short",
           "decimals": 1,
           "custom": {
-            "fillOpacity": 10
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
           }
         },
         "overrides": []
@@ -152,7 +156,7 @@
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT date_trunc('day', m.timestamp) AS time, m.prompt_type, ROUND(AVG(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens)) AS avg_tokens FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
+          "rawSql": "SELECT date_trunc('day', m.timestamp, 'Europe/Madrid') AS time, m.prompt_type, ROUND(AVG(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens)) AS avg_tokens FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
           "refId": "A"
         }
       ]
