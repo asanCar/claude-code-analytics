@@ -6,7 +6,7 @@
   "links": [],
   "schemaVersion": 39,
   "tags": ["claude-code"],
-  "time": {"from": "now-7d", "to": "now"},
+  "time": {"from": "now-30d", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
   "title": "Prompt Cost Ranking",
@@ -19,7 +19,7 @@
       "title": "Most Expensive Prompts",
       "description": "Individual messages ranked by total tokens. Identifies the single most expensive interactions.",
       "id": 1,
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 17},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 26},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {},
@@ -44,7 +44,7 @@
       "title": "Most Expensive Sessions",
       "description": "Sessions ranked by total tokens consumed. Highlights which conversations cost the most.",
       "id": 2,
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 27},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 36},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {},
@@ -66,7 +66,7 @@
       "title": "Top 10 Most Expensive Tools",
       "description": "Tools ranked by total tokens. Shows whether Read, Bash, Write, or other tools drive the most usage.",
       "id": 3,
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 9},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {"unit": "short", "decimals": 1},
@@ -92,7 +92,7 @@
       "title": "Avg Tokens: assistant_text",
       "description": "Average tokens per assistant text message. This is Claude's conversational response cost.",
       "id": 4,
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 9},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 18},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}, "overrides": []},
       "targets": [
@@ -109,7 +109,7 @@
       "title": "Avg Tokens: tool_use",
       "description": "Average tokens per tool_use message. This is the cost when Claude invokes a tool (Read, Write, Bash, etc.).",
       "id": 7,
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 9},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 18},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}, "overrides": []},
       "targets": [
@@ -157,6 +157,46 @@
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
           "rawSql": "SELECT date_trunc('day', m.timestamp, 'Europe/Madrid') AS time, m.prompt_type, ROUND(AVG(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens)) AS avg_tokens FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Average Tokens per Tool Over Time",
+      "description": "Average tokens per message, by tool, day by day. Limited to the top 10 tools by total token volume to keep the legend readable. Rising lines mean individual invocations of that tool are getting more expensive (e.g., Read pulling larger files, Bash producing larger output).",
+      "id": 8,
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 9},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["tool_name"]}
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH top_tools AS (SELECT m.tool_name FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND m.tool_name IS NOT NULL GROUP BY m.tool_name ORDER BY SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) DESC LIMIT 10) SELECT date_trunc('day', m.timestamp, 'Europe/Madrid') AS time, m.tool_name, ROUND(AVG(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens)) AS avg_tokens FROM messages m JOIN token_usage t ON t.message_uuid = m.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND m.tool_name IN (SELECT tool_name FROM top_tools) GROUP BY 1, 2 ORDER BY 1",
           "refId": "A"
         }
       ]
