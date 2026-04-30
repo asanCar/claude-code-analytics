@@ -32,7 +32,7 @@
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "legend": {"showLegend": false},
         "tooltip": {"mode": "single"}
       },
       "targets": [
@@ -62,7 +62,7 @@
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "legend": {"showLegend": false},
         "tooltip": {"mode": "single"}
       },
       "targets": [

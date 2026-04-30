@@ -92,7 +92,7 @@
         "overrides": []
       },
       "options": {
-        "legend": {"displayMode": "list", "placement": "bottom"},
+        "legend": {"showLegend": false},
         "tooltip": {"mode": "single"}
       },
       "targets": [

@@ -75,7 +75,7 @@
       "options": {
         "orientation": "horizontal",
         "barWidth": 0.8,
-        "legend": {"displayMode": "list", "placement": "bottom"},
+        "legend": {"showLegend": false},
         "tooltip": {"mode": "single"}
       },
       "targets": [
