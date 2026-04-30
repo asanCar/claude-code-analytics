@@ -135,7 +135,7 @@
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "SELECT timestamp AS time, utilization_pct, window_name FROM usage_snapshots WHERE window_name IN ('five_hour', 'seven_day') AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY 1",
+          "rawSql": "SELECT timestamp AS time, utilization_pct, CASE window_name WHEN 'five_hour' THEN '5h utilization window' WHEN 'seven_day' THEN 'weekly utilization window' END AS window_name FROM usage_snapshots WHERE window_name IN ('five_hour', 'seven_day') AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY 1",
           "refId": "A"
         }
       ]
