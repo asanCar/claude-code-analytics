@@ -1,5 +1,7 @@
 import json
 
+from bash_classifier import classify_bash
+
 SKIP_TYPES = {"progress", "file-history-snapshot", "system", "last-prompt"}
 
 
@@ -38,6 +40,12 @@ def parse_line(raw_line):
     else:
         prompt_type, prompt_text, tool_name = _classify_assistant_content(content)
 
+    bash_subcategory = (
+        classify_bash(prompt_text)
+        if prompt_type == "tool_use" and tool_name == "Bash"
+        else None
+    )
+
     result = {
         "uuid": uuid,
         "timestamp": timestamp,
@@ -45,6 +53,7 @@ def parse_line(raw_line):
         "prompt_type": prompt_type,
         "prompt_text": prompt_text,
         "tool_name": tool_name,
+        "bash_subcategory": bash_subcategory,
         "session_meta": session_meta,
     }
 

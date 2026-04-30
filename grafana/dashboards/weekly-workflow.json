@@ -1,0 +1,303 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "schemaVersion": 39,
+  "tags": ["claude-code"],
+  "time": {"from": "now-12w", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Weekly Workflow Trends",
+  "uid": "weekly-workflow",
+  "version": 1,
+  "templating": {"list": []},
+  "panels": [
+    {
+      "type": "stat",
+      "title": "This Week (tool tokens)",
+      "description": "Sum of input + output tokens for tool messages since this week's Monday (Europe/Madrid). Excludes assistant text and cache tokens to focus on workflow signal.",
+      "id": 1,
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COALESCE(SUM(t.input_tokens + t.output_tokens), 0)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp >= date_trunc('week', NOW(), 'Europe/Madrid')",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Last Week (tool tokens)",
+      "description": "Sum of input + output tokens for tool messages during the previous full ISO week (Mon-Sun, Europe/Madrid).",
+      "id": 2,
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COALESCE(SUM(t.input_tokens + t.output_tokens), 0)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp >= date_trunc('week', NOW(), 'Europe/Madrid') - INTERVAL '7 days' AND mc.timestamp < date_trunc('week', NOW(), 'Europe/Madrid')",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "WoW Change",
+      "description": "Percentage change of this week's tool tokens vs last week. Positive = consumption rising.",
+      "id": 3,
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 25},
+              {"color": "red", "value": 75}
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH this_week AS (SELECT COALESCE(SUM(t.input_tokens + t.output_tokens), 0)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp >= date_trunc('week', NOW(), 'Europe/Madrid')), last_week AS (SELECT COALESCE(SUM(t.input_tokens + t.output_tokens), 0)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp >= date_trunc('week', NOW(), 'Europe/Madrid') - INTERVAL '7 days' AND mc.timestamp < date_trunc('week', NOW(), 'Europe/Madrid')) SELECT ROUND(100.0 * (tw.tokens - lw.tokens) / NULLIF(lw.tokens, 0), 1) AS wow_pct FROM this_week tw, last_week lw",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "4-Week Avg (tool tokens)",
+      "description": "Average tool tokens per week over the previous 4 complete weeks (current week excluded). Baseline for spotting unusual weeks.",
+      "id": 4,
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "graphMode": "none", "colorMode": "value"},
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT ROUND(COALESCE(SUM(t.input_tokens + t.output_tokens), 0) / 4.0)::bigint AS avg_tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp >= date_trunc('week', NOW(), 'Europe/Madrid') - INTERVAL '28 days' AND mc.timestamp < date_trunc('week', NOW(), 'Europe/Madrid')",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tool Tokens per Week",
+      "description": "Total input + output tokens for tool messages bucketed by ISO week (Europe/Madrid). Cache tokens excluded so the trend reflects actual workflow effort.",
+      "id": 5,
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 4},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, SUM(t.input_tokens + t.output_tokens)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Category Mix per Week (absolute)",
+      "description": "Stacked weekly tokens by archetype. Bar height = total weekly volume; segments show absolute contribution from each category. Use this to compare *volume* shifts across categories.",
+      "id": 6,
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 12},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "custom": {
+            "drawStyle": "bars",
+            "stacking": {"mode": "normal"},
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["archetype"]}
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, mc.archetype, SUM(t.input_tokens + t.output_tokens)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Category Mix per Week (share %)",
+      "description": "Same data as the panel on the left, normalized to 100% per week. Use this to spot *proportion* shifts independent of total volume — e.g., 'this week was relatively more delegation-heavy'.",
+      "id": 7,
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 12},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "drawStyle": "bars",
+            "stacking": {"mode": "percent"},
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["archetype"]}
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, mc.archetype, SUM(t.input_tokens + t.output_tokens)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Sessions per Dominant Archetype per Week",
+      "description": "Each (non-subagent) session is labeled by the archetype that contributed the most tool tokens within it. Stacked bars show how many sessions of each archetype happened per week. Reveals shifts in your *kind* of work, not just volume.",
+      "id": 8,
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 22},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "custom": {
+            "drawStyle": "bars",
+            "stacking": {"mode": "normal"},
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["archetype"]}
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH session_archetype AS (SELECT mc.session_id, mc.archetype, SUM(t.input_tokens + t.output_tokens) AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2), session_dominant AS (SELECT DISTINCT ON (session_id) session_id, archetype FROM session_archetype ORDER BY session_id, tokens DESC) SELECT date_trunc('week', s.started_at, 'Europe/Madrid') AS time, sd.archetype, COUNT(*)::bigint AS sessions FROM session_dominant sd JOIN sessions s ON s.session_id = sd.session_id WHERE s.started_at BETWEEN $__timeFrom() AND $__timeTo() AND s.is_subagent = false GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Avg Tokens per Message by Archetype",
+      "description": "Weekly average of input + output tokens per individual tool message, partitioned by archetype. Rising lines mean a category's individual invocations are getting heavier (e.g., reading larger files, longer Bash output, more Edit churn).",
+      "id": 9,
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 32},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "lastNotNull"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {"fields": ["archetype"]}
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, mc.archetype, ROUND(AVG(t.input_tokens + t.output_tokens))::bigint AS avg_tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

@@ -133,6 +133,7 @@ def process_file(conn, filepath, is_subagent, parent_session_id):
                 "prompt_type": parsed["prompt_type"],
                 "prompt_text": parsed["prompt_text"],
                 "tool_name": parsed["tool_name"],
+                "bash_subcategory": parsed.get("bash_subcategory"),
             })
 
             if parsed.get("usage"):

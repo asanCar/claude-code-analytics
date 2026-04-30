@@ -24,8 +24,8 @@ def upsert_session(conn, data):
 def insert_message(conn, data):
     with conn.cursor() as cur:
         cur.execute("""
-            INSERT INTO messages (message_uuid, session_id, timestamp, role, prompt_type, prompt_text, tool_name)
-            VALUES (%(message_uuid)s, %(session_id)s, %(timestamp)s, %(role)s, %(prompt_type)s, %(prompt_text)s, %(tool_name)s)
+            INSERT INTO messages (message_uuid, session_id, timestamp, role, prompt_type, prompt_text, tool_name, bash_subcategory)
+            VALUES (%(message_uuid)s, %(session_id)s, %(timestamp)s, %(role)s, %(prompt_type)s, %(prompt_text)s, %(tool_name)s, %(bash_subcategory)s)
             ON CONFLICT (message_uuid) DO NOTHING
         """, data)
 
