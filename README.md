@@ -27,3 +27,33 @@ macOS Keychain.
 `./scripts/up.sh` installs and loads the agent; `./scripts/down.sh` unloads it.
 The agent runs `scripts/sync-token.sh` at load and every 30 minutes. Logs go to
 `/tmp/claude-code-analytics-token-sync.log`.
+
+## Auto-start at login (macOS, optional)
+
+`scripts/com.claude-code-analytics.up.plist` is a launchd agent that runs
+`scripts/up.sh` at login, waiting up to 5 minutes for Docker to become
+available before bringing the stack up.
+
+The plist ships with example paths and must be edited before use:
+
+| Field | Path | Adjust if |
+|-------|------|-----------|
+| `ProgramArguments` (line 11) | `/Users/alejandrosanchez/Workspace/claude-code-analytics/scripts/up.sh` | Project lives elsewhere |
+| `ProgramArguments` (line 11) | `/opt/homebrew/bin/docker` | Using Intel Mac (`/usr/local/bin/docker`) |
+| `EnvironmentVariables` → `PATH` | Includes `/opt/homebrew/bin` | Using Intel Mac (replace with `/usr/local/bin`) |
+
+Install:
+
+```bash
+cp scripts/com.claude-code-analytics.up.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.claude-code-analytics.up.plist
+```
+
+Remove:
+
+```bash
+launchctl unload ~/Library/LaunchAgents/com.claude-code-analytics.up.plist
+rm ~/Library/LaunchAgents/com.claude-code-analytics.up.plist
+```
+
+Logs go to `/tmp/claude-code-analytics-up.log`.
