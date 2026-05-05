@@ -317,8 +317,8 @@
     },
     {
       "type": "barchart",
-      "title": "Archetype Mix (share %)",
-      "description": "Tool-token share by archetype within this session, normalized to 100%.\n\nBash subcategories are rolled up:\n- read / search / git-read → exploration\n- test / build / deps → build_test\n- infra-* / db → infra_ops\n- fileops / git-write / exec → shell_ops\n\nNon-Bash tools are mapped by name:\n- Read / Grep / Glob → exploration\n- Edit / Write / MultiEdit → active_coding\n- Task / Agent / TaskCreate / TaskUpdate / TaskList / TaskOutput / TaskStop → self_orchestration\n- WebFetch / WebSearch / ToolSearch → research\n- mcp__* → mcp",
+      "title": "Archetype Mix (%)",
+      "description": "Tool-token percentage by archetype within this session, normalized to 100%.\n\nBash subcategories are rolled up:\n- read / search / git-read → exploration\n- test / build / deps → build_test\n- infra-* / db → infra_ops\n- fileops / git-write / exec → shell_ops\n\nNon-Bash tools are mapped by name:\n- Read / Grep / Glob → exploration\n- Edit / Write / MultiEdit → active_coding\n- Task / Agent / TaskCreate / TaskUpdate / TaskList / TaskOutput / TaskStop → self_orchestration\n- WebFetch / WebSearch / ToolSearch → research\n- mcp__* → mcp",
       "id": 12,
       "gridPos": {"h": 6, "w": 24, "x": 0, "y": 42},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -352,7 +352,7 @@
           "options": {
             "columnField": "archetype",
             "rowField": "scope",
-            "valueField": "share",
+            "valueField": "pct",
             "emptyValue": "zero"
           }
         }
@@ -361,7 +361,7 @@
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "WITH session_total AS (SELECT SUM(t.input_tokens + t.output_tokens)::numeric AS total FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.session_id = '$session' AND mc.archetype IS NOT NULL), by_archetype AS (SELECT mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.session_id = '$session' AND mc.archetype IS NOT NULL GROUP BY mc.archetype) SELECT 'session' AS scope, b.archetype, (b.tokens / NULLIF(st.total, 0))::float AS share FROM by_archetype b CROSS JOIN session_total st ORDER BY share DESC",
+          "rawSql": "WITH session_total AS (SELECT SUM(t.input_tokens + t.output_tokens)::numeric AS total FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.session_id = '$session' AND mc.archetype IS NOT NULL), by_archetype AS (SELECT mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.session_id = '$session' AND mc.archetype IS NOT NULL GROUP BY mc.archetype) SELECT 'session' AS scope, b.archetype, (b.tokens / NULLIF(st.total, 0))::float AS pct FROM by_archetype b CROSS JOIN session_total st ORDER BY pct DESC",
           "refId": "A"
         }
       ]

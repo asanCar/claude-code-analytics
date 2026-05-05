@@ -488,8 +488,8 @@
     },
     {
       "type": "timeseries",
-      "title": "Category Mix per Week (share %)",
-      "description": "Same data as the panel on the left, normalized to 100% per week. Use this to spot *proportion* shifts independent of total volume \u2014 e.g., 'this week leaned more on self_orchestration (subagents + todo lists)'. Legend mean = average share over the selected period.",
+      "title": "Category Mix per Week (%)",
+      "description": "Same data as the panel on the left, normalized to 100% per week. Use this to spot *proportion* shifts independent of total volume \u2014 e.g., 'this week leaned more on self_orchestration (subagents + todo lists)'. Legend mean = average percentage over the selected period.",
       "id": 7,
       "gridPos": {
         "h": 10,
@@ -522,7 +522,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share exploration"
+              "options": "exploration"
             },
             "properties": [
               {
@@ -537,7 +537,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share active_coding"
+              "options": "active_coding"
             },
             "properties": [
               {
@@ -552,7 +552,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share shell_ops"
+              "options": "shell_ops"
             },
             "properties": [
               {
@@ -567,7 +567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share self_orchestration"
+              "options": "self_orchestration"
             },
             "properties": [
               {
@@ -582,7 +582,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share infra_ops"
+              "options": "infra_ops"
             },
             "properties": [
               {
@@ -597,7 +597,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share research"
+              "options": "research"
             },
             "properties": [
               {
@@ -612,7 +612,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share build_test"
+              "options": "build_test"
             },
             "properties": [
               {
@@ -627,7 +627,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share mcp"
+              "options": "mcp"
             },
             "properties": [
               {
@@ -642,7 +642,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share other"
+              "options": "other"
             },
             "properties": [
               {
@@ -671,16 +671,7 @@
           "sort": "desc"
         }
       },
-      "transformations": [
-        {
-          "id": "partitionByValues",
-          "options": {
-            "fields": [
-              "archetype"
-            ]
-          }
-        }
-      ],
+      "transformations": [],
       "targets": [
         {
           "datasource": {
@@ -688,7 +679,7 @@
             "uid": "postgresql"
           },
           "format": "table",
-          "rawSql": "WITH weekly AS (SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2), totals AS (SELECT time, SUM(tokens) AS total FROM weekly GROUP BY time) SELECT w.time, w.archetype, (w.tokens / NULLIF(t.total, 0))::float AS share FROM weekly w JOIN totals t ON t.time = w.time ORDER BY w.time",
+          "rawSql": "WITH weekly AS (SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2), totals AS (SELECT time, SUM(tokens) AS total FROM weekly GROUP BY time) SELECT w.time, MAX(CASE WHEN w.archetype = 'exploration'        THEN w.tokens / NULLIF(t.total,0) END)::float AS exploration, MAX(CASE WHEN w.archetype = 'active_coding'      THEN w.tokens / NULLIF(t.total,0) END)::float AS active_coding, MAX(CASE WHEN w.archetype = 'shell_ops'          THEN w.tokens / NULLIF(t.total,0) END)::float AS shell_ops, MAX(CASE WHEN w.archetype = 'self_orchestration' THEN w.tokens / NULLIF(t.total,0) END)::float AS self_orchestration, MAX(CASE WHEN w.archetype = 'infra_ops'          THEN w.tokens / NULLIF(t.total,0) END)::float AS infra_ops, MAX(CASE WHEN w.archetype = 'research'           THEN w.tokens / NULLIF(t.total,0) END)::float AS research, MAX(CASE WHEN w.archetype = 'build_test'         THEN w.tokens / NULLIF(t.total,0) END)::float AS build_test, MAX(CASE WHEN w.archetype = 'mcp'                THEN w.tokens / NULLIF(t.total,0) END)::float AS mcp, MAX(CASE WHEN w.archetype = 'other'              THEN w.tokens / NULLIF(t.total,0) END)::float AS other FROM weekly w JOIN totals t ON t.time = w.time GROUP BY w.time ORDER BY w.time",
           "refId": "A"
         }
       ]

@@ -133,7 +133,7 @@
     },
     {
       "type": "barchart",
-      "title": "Archetype Mix by Project (share %)",
+      "title": "Archetype Mix by Project (%)",
       "description": "Top 10 projects by total archetype tokens, with each bar normalized to 100% and segmented by archetype.\n\nBash subcategories are rolled up:\n- read / search / git-read → exploration\n- test / build / deps → build_test\n- infra-* / db → infra_ops\n- fileops / git-write / exec → shell_ops\n\nNon-Bash tools are mapped by name:\n- Read / Grep / Glob → exploration\n- Edit / Write / MultiEdit → active_coding\n- Task / Agent / TaskCreate / TaskUpdate / TaskList / TaskOutput / TaskStop → self_orchestration\n- WebFetch / WebSearch / ToolSearch → research\n- mcp__* → mcp\n\nUse this to compare *kinds* of work across projects independent of volume.",
       "id": 5,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 26},
@@ -168,7 +168,7 @@
           "options": {
             "columnField": "archetype",
             "rowField": "project",
-            "valueField": "share",
+            "valueField": "pct",
             "emptyValue": "zero"
           }
         }
@@ -177,7 +177,7 @@
         {
           "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
           "format": "table",
-          "rawSql": "WITH top_projects AS (SELECT s.project, SUM(t.input_tokens + t.output_tokens)::numeric AS proj_total FROM sessions s JOIN messages_classified mc ON mc.session_id = s.session_id JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND mc.archetype IS NOT NULL AND s.project IN ($project) GROUP BY s.project ORDER BY proj_total DESC LIMIT 10), by_archetype AS (SELECT s.project, mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM sessions s JOIN messages_classified mc ON mc.session_id = s.session_id JOIN token_usage t ON t.message_uuid = mc.message_uuid JOIN top_projects tp ON tp.project = s.project WHERE mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND mc.archetype IS NOT NULL GROUP BY s.project, mc.archetype) SELECT b.project, b.archetype, (b.tokens / NULLIF(tp.proj_total, 0))::float AS share FROM by_archetype b JOIN top_projects tp ON tp.project = b.project ORDER BY tp.proj_total DESC",
+          "rawSql": "WITH top_projects AS (SELECT s.project, SUM(t.input_tokens + t.output_tokens)::numeric AS proj_total FROM sessions s JOIN messages_classified mc ON mc.session_id = s.session_id JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND mc.archetype IS NOT NULL AND s.project IN ($project) GROUP BY s.project ORDER BY proj_total DESC LIMIT 10), by_archetype AS (SELECT s.project, mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM sessions s JOIN messages_classified mc ON mc.session_id = s.session_id JOIN token_usage t ON t.message_uuid = mc.message_uuid JOIN top_projects tp ON tp.project = s.project WHERE mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND mc.archetype IS NOT NULL GROUP BY s.project, mc.archetype) SELECT b.project, b.archetype, (b.tokens / NULLIF(tp.proj_total, 0))::float AS pct FROM by_archetype b JOIN top_projects tp ON tp.project = b.project ORDER BY tp.proj_total DESC",
           "refId": "A"
         }
       ]
