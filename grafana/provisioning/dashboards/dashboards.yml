@@ -11,3 +11,14 @@ providers:
     options:
       path: /var/lib/grafana/dashboards
       foldersFromFilesStructure: false
+
+  - name: Summary
+    orgId: 1
+    folder: Summary
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards-summary
+      foldersFromFilesStructure: false

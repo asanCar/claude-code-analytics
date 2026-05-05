@@ -1,0 +1,323 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [
+    {
+      "type": "link",
+      "title": "Overview",
+      "tooltip": "Full daily token breakdown by type (input / output / cache)",
+      "url": "/d/overview/",
+      "icon": "external link",
+      "targetBlank": false,
+      "keepTime": true
+    },
+    {
+      "type": "link",
+      "title": "Per-Project Breakdown",
+      "tooltip": "Drill into per-project usage, tool mix, and archetype mix",
+      "url": "/d/per-project/",
+      "icon": "external link",
+      "targetBlank": false,
+      "keepTime": true
+    },
+    {
+      "type": "link",
+      "title": "Per-Session Detail",
+      "tooltip": "Inspect individual sessions message-by-message",
+      "url": "/d/per-session/",
+      "icon": "external link",
+      "targetBlank": false,
+      "keepTime": false
+    },
+    {
+      "type": "link",
+      "title": "Weekly Workflow Trends",
+      "tooltip": "Long-window trends and week-over-week deltas",
+      "url": "/d/weekly-workflow/",
+      "icon": "external link",
+      "targetBlank": false,
+      "keepTime": false
+    },
+    {
+      "type": "link",
+      "title": "Cache Efficiency",
+      "tooltip": "How much of Claude's context is being reused via cache",
+      "url": "/d/cache-efficiency/",
+      "icon": "external link",
+      "targetBlank": false,
+      "keepTime": true
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["claude-code", "summary"],
+  "time": {"from": "now-30d", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Summary",
+  "uid": "summary",
+  "version": 1,
+  "templating": {"list": []},
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Current Plan",
+      "description": "Detected Claude plan tier (PRO / MAX5 / MAX20). Pulled from the latest OAuth poll.",
+      "id": 1,
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {"color": {"mode": "fixed", "fixedColor": "blue"}},
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT plan FROM usage_snapshots ORDER BY timestamp DESC LIMIT 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Plan utilization (5h)",
+      "description": "How much of the rolling 5-hour rate-limit budget is currently consumed. Approaching 100% means throttling is imminent.",
+      "id": 2,
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "red", "value": 80}
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "time_series",
+          "rawSql": "SELECT timestamp AS time, utilization_pct AS value FROM usage_snapshots WHERE window_name = 'five_hour' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY timestamp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Plan utilization (7d)",
+      "description": "How much of the rolling 7-day rate-limit budget is currently consumed. The slower-moving sibling of the 5-hour gauge.",
+      "id": 3,
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "red", "value": 80}
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value",
+        "graphMode": "area",
+        "colorMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "time_series",
+          "rawSql": "SELECT timestamp AS time, utilization_pct AS value FROM usage_snapshots WHERE window_name = 'seven_day' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY timestamp",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Tokens this week",
+      "description": "Sum of input + output tokens for tool messages since this week's Monday (Europe/Madrid). Excludes cache and assistant text to track active workflow signal.",
+      "id": 4,
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "color": {"mode": "fixed", "fixedColor": "blue"}
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value",
+        "graphMode": "none",
+        "colorMode": "value"
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT COALESCE(SUM(t.input_tokens + t.output_tokens), 0)::bigint AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp >= date_trunc('week', NOW(), 'Europe/Madrid')",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Daily Claude activity",
+      "description": "Total tokens consumed per day across all token types (input + output + cache). One line — overall volume only, no per-type breakdown. Use the Overview dashboard for the full split.",
+      "id": 5,
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 4},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "color": {"mode": "fixed", "fixedColor": "blue"},
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "showPoints": "auto",
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "total_tokens"},
+            "properties": [{"id": "displayName", "value": "Total tokens / day"}]
+          }
+        ]
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom", "calcs": ["sum", "mean"]},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT date_trunc('day', m.timestamp, 'Europe/Madrid') AS time, SUM(t.input_tokens + t.output_tokens + t.cache_creation_tokens + t.cache_read_tokens) AS total_tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Top projects by tokens",
+      "description": "Top 10 projects ranked by total tokens (input + output + cache) over the selected window. Identifies the codebases driving the most Claude usage.\n\nClick a bar to open the Per-Project Breakdown dashboard pre-filtered to that project.",
+      "id": 6,
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 12},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "links": [
+            {
+              "title": "Drill into ${__data.fields.project}",
+              "url": "/d/per-project/?var-project=${__data.fields.project}&${__url_time_range}",
+              "targetBlank": false
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "barWidth": 0.8,
+        "legend": {"showLegend": false},
+        "tooltip": {"mode": "single"}
+      },
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "SELECT s.project, SUM(t.input_tokens + t.output_tokens + t.cache_read_tokens + t.cache_creation_tokens) AS total_tokens FROM token_usage t JOIN messages m ON m.message_uuid = t.message_uuid JOIN sessions s ON s.session_id = m.session_id WHERE m.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY s.project ORDER BY total_tokens DESC LIMIT 10",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Work mix per week (%)",
+      "description": "Each weekly bar is normalized to 100% and split by archetype (kind of work). A segment's height is the percentage of that week's tool tokens contributed by that archetype — e.g., 40% exploration means 40% of the week's tool-token volume came from exploration tools (Read/Grep/Glob plus bash read/search/git-read). Shifts in the proportions reveal when the *type* of work changes, independent of total volume.\n\nArchetypes: exploration, active_coding, shell_ops, self_orchestration, build_test, infra_ops, research, mcp, other.",
+      "id": 7,
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 12},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "min": 0,
+          "max": 1,
+          "custom": {
+            "drawStyle": "bars",
+            "stacking": {"mode": "normal"},
+            "fillOpacity": 80,
+            "lineWidth": 1,
+            "barAlignment": 0,
+            "barWidthFactor": 0.9
+          }
+        },
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "exploration"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}]},
+          {"matcher": {"id": "byName", "options": "active_coding"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}]},
+          {"matcher": {"id": "byName", "options": "shell_ops"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}]},
+          {"matcher": {"id": "byName", "options": "self_orchestration"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "purple"}}]},
+          {"matcher": {"id": "byName", "options": "infra_ops"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}]},
+          {"matcher": {"id": "byName", "options": "research"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}]},
+          {"matcher": {"id": "byName", "options": "build_test"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}]},
+          {"matcher": {"id": "byName", "options": "mcp"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "light-purple"}}]},
+          {"matcher": {"id": "byName", "options": "other"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "semi-dark-yellow"}}]}
+        ]
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean"], "sortBy": "Mean", "sortDesc": true},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH weekly AS (SELECT date_trunc('week', mc.timestamp, 'Europe/Madrid') AS time, mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM messages_classified mc JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.archetype IS NOT NULL AND mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() GROUP BY 1, 2), totals AS (SELECT time, SUM(tokens) AS total FROM weekly GROUP BY time) SELECT w.time, MAX(CASE WHEN w.archetype = 'exploration'        THEN w.tokens / NULLIF(t.total,0) END)::float AS exploration, MAX(CASE WHEN w.archetype = 'active_coding'      THEN w.tokens / NULLIF(t.total,0) END)::float AS active_coding, MAX(CASE WHEN w.archetype = 'shell_ops'          THEN w.tokens / NULLIF(t.total,0) END)::float AS shell_ops, MAX(CASE WHEN w.archetype = 'self_orchestration' THEN w.tokens / NULLIF(t.total,0) END)::float AS self_orchestration, MAX(CASE WHEN w.archetype = 'infra_ops'          THEN w.tokens / NULLIF(t.total,0) END)::float AS infra_ops, MAX(CASE WHEN w.archetype = 'research'           THEN w.tokens / NULLIF(t.total,0) END)::float AS research, MAX(CASE WHEN w.archetype = 'build_test'         THEN w.tokens / NULLIF(t.total,0) END)::float AS build_test, MAX(CASE WHEN w.archetype = 'mcp'                THEN w.tokens / NULLIF(t.total,0) END)::float AS mcp, MAX(CASE WHEN w.archetype = 'other'              THEN w.tokens / NULLIF(t.total,0) END)::float AS other FROM weekly w JOIN totals t ON t.time = w.time GROUP BY w.time ORDER BY w.time",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

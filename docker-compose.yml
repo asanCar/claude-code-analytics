@@ -32,6 +32,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/dashboards-summary:/var/lib/grafana/dashboards-summary
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
