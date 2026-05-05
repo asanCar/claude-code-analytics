@@ -360,7 +360,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "tokens delegation"
+              "options": "tokens self_orchestration"
             },
             "properties": [
               {
@@ -489,7 +489,7 @@
     {
       "type": "timeseries",
       "title": "Category Mix per Week (share %)",
-      "description": "Same data as the panel on the left, normalized to 100% per week. Use this to spot *proportion* shifts independent of total volume \u2014 e.g., 'this week was relatively more delegation-heavy'. Legend mean = average share over the selected period.",
+      "description": "Same data as the panel on the left, normalized to 100% per week. Use this to spot *proportion* shifts independent of total volume \u2014 e.g., 'this week leaned more on self_orchestration (subagents + todo lists)'. Legend mean = average share over the selected period.",
       "id": 7,
       "gridPos": {
         "h": 10,
@@ -567,7 +567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "share delegation"
+              "options": "share self_orchestration"
             },
             "properties": [
               {
@@ -772,7 +772,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sessions delegation"
+              "options": "sessions self_orchestration"
             },
             "properties": [
               {
@@ -972,7 +972,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "avg_tokens delegation"
+              "options": "avg_tokens self_orchestration"
             },
             "properties": [
               {

@@ -238,6 +238,29 @@ DROP VIEW IF EXISTS messages_classified;
 DROP MATERIALIZED VIEW IF EXISTS bash_classifications;
 
 -- View that rolls Bash subcategory + tool_name up into a top-level archetype.
+--
+-- Archetype catalogue (the value returned in the `archetype` column):
+--   exploration        Reading / searching the codebase or repo state
+--                      (Read, Grep, Glob; Bash: read, search, git-read).
+--   active_coding      Modifying files (Edit, Write, MultiEdit).
+--   shell_ops          Local shell side-effects: file ops, git writes,
+--                      arbitrary exec (Bash: fileops, git-write, exec).
+--   build_test         Compile / test / dependency operations
+--                      (Bash: test, build, deps).
+--   infra_ops          Infrastructure & database operations
+--                      (Bash: infra-write, infra-read, db).
+--   research           External information gathering
+--                      (WebFetch, WebSearch, ToolSearch; Bash: research).
+--   self_orchestration Claude organising its own work — spawning
+--                      subagents (Task, Agent) AND managing its own
+--                      todo list (TaskCreate / Update / Get / List /
+--                      Output / Stop). Both are meta-cognition, not
+--                      delegation in the human sense (TaskList has no
+--                      recipient), hence "self".
+--   mcp                Any MCP tool call (tool_name LIKE 'mcp__%').
+--   other              Tool call that didn't match any rule above.
+--   NULL               Non-tool messages (human_input, assistant_text,
+--                      tool_result).
 CREATE OR REPLACE VIEW messages_classified AS
 SELECT
   m.*,
@@ -261,7 +284,7 @@ SELECT
       END
     WHEN m.tool_name IN ('Read', 'Grep', 'Glob') THEN 'exploration'
     WHEN m.tool_name IN ('Edit', 'Write', 'MultiEdit') THEN 'active_coding'
-    WHEN m.tool_name IN ('Task','TaskCreate','TaskUpdate','TaskGet','TaskList','TaskOutput','TaskStop','Agent') THEN 'delegation'
+    WHEN m.tool_name IN ('Task','TaskCreate','TaskUpdate','TaskGet','TaskList','TaskOutput','TaskStop','Agent') THEN 'self_orchestration'
     WHEN m.tool_name IN ('WebFetch','WebSearch','ToolSearch') THEN 'research'
     WHEN m.tool_name LIKE 'mcp__%' THEN 'mcp'
     WHEN m.tool_name IS NOT NULL THEN 'other'

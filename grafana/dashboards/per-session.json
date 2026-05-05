@@ -318,7 +318,7 @@
     {
       "type": "barchart",
       "title": "Archetype Mix (share %)",
-      "description": "Tool-token share by archetype within this session, normalized to 100%.\n\nBash subcategories are rolled up:\n- read / search / git-read → exploration\n- test / build / deps → build_test\n- infra-* / db → infra_ops\n- fileops / git-write / exec → shell_ops\n\nNon-Bash tools are mapped by name (Read/Grep/Glob → exploration, Edit/Write → active_coding, Task/Agent → delegation, WebFetch/WebSearch → research, mcp__* → mcp).",
+      "description": "Tool-token share by archetype within this session, normalized to 100%.\n\nBash subcategories are rolled up:\n- read / search / git-read → exploration\n- test / build / deps → build_test\n- infra-* / db → infra_ops\n- fileops / git-write / exec → shell_ops\n\nNon-Bash tools are mapped by name:\n- Read / Grep / Glob → exploration\n- Edit / Write / MultiEdit → active_coding\n- Task / Agent / TaskCreate / TaskUpdate / TaskList / TaskOutput / TaskStop → self_orchestration\n- WebFetch / WebSearch / ToolSearch → research\n- mcp__* → mcp",
       "id": 12,
       "gridPos": {"h": 6, "w": 24, "x": 0, "y": 42},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -328,7 +328,7 @@
           {"matcher": {"id": "byName", "options": "exploration"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}]},
           {"matcher": {"id": "byName", "options": "active_coding"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}]},
           {"matcher": {"id": "byName", "options": "shell_ops"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}]},
-          {"matcher": {"id": "byName", "options": "delegation"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "purple"}}]},
+          {"matcher": {"id": "byName", "options": "self_orchestration"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "purple"}}]},
           {"matcher": {"id": "byName", "options": "infra_ops"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}]},
           {"matcher": {"id": "byName", "options": "research"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}]},
           {"matcher": {"id": "byName", "options": "build_test"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}]},
