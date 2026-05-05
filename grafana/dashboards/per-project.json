@@ -132,11 +132,62 @@
       ]
     },
     {
+      "type": "barchart",
+      "title": "Archetype Mix by Project (share %)",
+      "description": "Top 10 projects by total archetype tokens, with each bar normalized to 100% and segmented by archetype.\n\nBash subcategories are rolled up:\n- read / search / git-read → exploration\n- test / build / deps → build_test\n- infra-* / db → infra_ops\n- fileops / git-write / exec → shell_ops\n\nNon-Bash tools are mapped by name (Read/Grep/Glob → exploration, Edit/Write → active_coding, Task/Agent → delegation, WebFetch/WebSearch → research, mcp__* → mcp).\n\nUse this to compare *kinds* of work across projects independent of volume.",
+      "id": 5,
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 26},
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+      "fieldConfig": {
+        "defaults": {"unit": "percentunit", "decimals": 1, "min": 0, "max": 1},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "exploration"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}]},
+          {"matcher": {"id": "byName", "options": "active_coding"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}]},
+          {"matcher": {"id": "byName", "options": "shell_ops"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}]},
+          {"matcher": {"id": "byName", "options": "delegation"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "purple"}}]},
+          {"matcher": {"id": "byName", "options": "infra_ops"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}]},
+          {"matcher": {"id": "byName", "options": "research"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}]},
+          {"matcher": {"id": "byName", "options": "build_test"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}]},
+          {"matcher": {"id": "byName", "options": "mcp"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "light-purple"}}]},
+          {"matcher": {"id": "byName", "options": "other"}, "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "semi-dark-yellow"}}]}
+        ]
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xTickLabelRotation": 0,
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "stacking": "normal",
+        "showValue": "never",
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["mean"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "archetype",
+            "rowField": "project",
+            "valueField": "share",
+            "emptyValue": "zero"
+          }
+        }
+      ],
+      "targets": [
+        {
+          "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
+          "format": "table",
+          "rawSql": "WITH top_projects AS (SELECT s.project, SUM(t.input_tokens + t.output_tokens)::numeric AS proj_total FROM sessions s JOIN messages_classified mc ON mc.session_id = s.session_id JOIN token_usage t ON t.message_uuid = mc.message_uuid WHERE mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND mc.archetype IS NOT NULL AND s.project IN ($project) GROUP BY s.project ORDER BY proj_total DESC LIMIT 10), by_archetype AS (SELECT s.project, mc.archetype, SUM(t.input_tokens + t.output_tokens)::numeric AS tokens FROM sessions s JOIN messages_classified mc ON mc.session_id = s.session_id JOIN token_usage t ON t.message_uuid = mc.message_uuid JOIN top_projects tp ON tp.project = s.project WHERE mc.timestamp BETWEEN $__timeFrom() AND $__timeTo() AND mc.archetype IS NOT NULL GROUP BY s.project, mc.archetype) SELECT b.project, b.archetype, (b.tokens / NULLIF(tp.proj_total, 0))::float AS share FROM by_archetype b JOIN top_projects tp ON tp.project = b.project ORDER BY tp.proj_total DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "type": "table",
       "title": "Sessions Per Project",
       "description": "Summary table with session count, total tokens, and date range per project. Full path shown in project_path column.",
       "id": 3,
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 26},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 36},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
       "fieldConfig": {
         "defaults": {},

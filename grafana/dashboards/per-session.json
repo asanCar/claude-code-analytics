@@ -7,7 +7,7 @@
   "schemaVersion": 39,
   "tags": ["claude-code"],
   "time": {"from": "now-7d", "to": "now"},
-  "timepicker": {},
+  "timepicker": {"hidden": true},
   "timezone": "browser",
   "title": "Per-Session Detail",
   "uid": "per-session",
@@ -34,7 +34,7 @@
     {
       "type": "table",
       "title": "Sessions (click a session_id to filter)",
-      "description": "All sessions for the selected project (subagents excluded). Click a row's session_id to load it into the rest of the dashboard; the time picker also snaps to that session's window. Catalog itself is independent of the time picker.",
+      "description": "All sessions for the selected project (subagents excluded). Click a row's session_id to load it into the rest of the dashboard.",
       "id": 11,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
