@@ -9,7 +9,7 @@
   "time": {"from": "now-7d", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
-  "title": "Overview",
+  "title": "Token Utilization",
   "uid": "overview",
   "version": 1,
   "templating": {"list": []},

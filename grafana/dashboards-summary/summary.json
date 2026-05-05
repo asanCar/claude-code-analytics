@@ -6,8 +6,8 @@
   "links": [
     {
       "type": "link",
-      "title": "Overview",
-      "tooltip": "Full daily token breakdown by type (input / output / cache)",
+      "title": "Token Utilization",
+      "tooltip": "Full daily token breakdown by type (input / output / cache) plus plan utilization trend",
       "url": "/d/overview/",
       "icon": "external link",
       "targetBlank": false,
@@ -197,7 +197,7 @@
     {
       "type": "timeseries",
       "title": "Daily Claude activity",
-      "description": "Total tokens consumed per day across all token types (input + output + cache). One line — overall volume only, no per-type breakdown. Use the Overview dashboard for the full split.",
+      "description": "Total tokens consumed per day across all token types (input + output + cache). One line — overall volume only, no per-type breakdown. Use the Token Utilization dashboard for the full split.",
       "id": 5,
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 4},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
@@ -274,7 +274,7 @@
     {
       "type": "timeseries",
       "title": "Work mix per week (%)",
-      "description": "Each weekly bar is normalized to 100% and split by archetype (kind of work). A segment's height is the percentage of that week's tool tokens contributed by that archetype — e.g., 40% exploration means 40% of the week's tool-token volume came from exploration tools (Read/Grep/Glob plus bash read/search/git-read). Shifts in the proportions reveal when the *type* of work changes, independent of total volume.\n\nArchetypes: exploration, active_coding, shell_ops, self_orchestration, build_test, infra_ops, research, mcp, other.",
+      "description": "Weekly tool tokens normalized to 100% and split by archetype (kind of work). Reveals shifts in the *type* of work over time, independent of total volume.\n\nArchetypes:\n- **exploration** — reading & searching code (Read, Grep, Glob, bash read/search/git-read)\n- **active_coding** — modifying files (Edit, Write, MultiEdit)\n- **shell_ops** — file ops, git writes, arbitrary shell commands\n- **self_orchestration** — spawning subagents and managing todo lists (Task, Agent, TaskCreate/Update/List/etc.)\n- **build_test** — compile, test, and dependency commands\n- **infra_ops** — infrastructure and database operations\n- **research** — external info gathering (WebFetch, WebSearch, ToolSearch)\n- **mcp** — any MCP tool call\n- **other** — tool call that didn't match the rules above",
       "id": 7,
       "gridPos": {"h": 10, "w": 12, "x": 12, "y": 12},
       "datasource": {"type": "grafana-postgresql-datasource", "uid": "postgresql"},
