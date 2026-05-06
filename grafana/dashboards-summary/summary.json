@@ -8,10 +8,10 @@
       "type": "link",
       "title": "Token Utilization",
       "tooltip": "Full daily token breakdown by type (input / output / cache) plus plan utilization trend",
-      "url": "/d/overview/",
+      "url": "/d/token-utilization/",
       "icon": "external link",
       "targetBlank": false,
-      "keepTime": true
+      "keepTime": false
     },
     {
       "type": "link",
@@ -20,7 +20,7 @@
       "url": "/d/per-project/",
       "icon": "external link",
       "targetBlank": false,
-      "keepTime": true
+      "keepTime": false
     },
     {
       "type": "link",
@@ -47,7 +47,7 @@
       "url": "/d/cache-efficiency/",
       "icon": "external link",
       "targetBlank": false,
-      "keepTime": true
+      "keepTime": false
     }
   ],
   "schemaVersion": 39,
@@ -72,7 +72,7 @@
         "overrides": []
       },
       "options": {
-        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "plan", "values": false},
         "textMode": "value",
         "graphMode": "none",
         "colorMode": "value"

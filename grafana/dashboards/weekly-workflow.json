@@ -5,7 +5,17 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "type": "link",
+      "title": "Back to Summary",
+      "tooltip": "Return to the Summary dashboard",
+      "url": "/d/summary/",
+      "icon": "dashboard",
+      "targetBlank": false,
+      "keepTime": false
+    }
+  ],
   "schemaVersion": 39,
   "tags": [
     "claude-code"
