@@ -2,6 +2,8 @@
 
 Local monitoring stack for Claude Code token usage. Ingests session JSONL files into PostgreSQL and provides Grafana dashboards.
 
+**Live site:** <https://asancar.github.io/claude-code-analytics/>
+
 ## Quick Start
 
 1. Copy `.env.example` to `.env` and fill in values
