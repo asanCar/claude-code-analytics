@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -10,9 +12,7 @@ import '../styles/global.css';
     <meta name="description" content="Local analytics for Claude Code. PostgreSQL + Grafana, all on your machine." />
   </head>
   <body>
-    <main class="container">
-      <h1>claude-code-analytics</h1>
-      <p class="muted">Local analytics for Claude Code.</p>
-    </main>
+    <Nav />
+    <Hero />
   </body>
 </html>

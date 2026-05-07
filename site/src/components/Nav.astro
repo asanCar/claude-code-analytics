@@ -1,0 +1,55 @@
+---
+const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
+---
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="#top" class="nav-brand">claude-code-analytics</a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#dashboards">Dashboards</a></li>
+      <li><a href={repoUrl} target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(11, 13, 16, 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  .nav-brand {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .nav-brand:hover { text-decoration: none; color: var(--accent); }
+  .nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+  }
+  .nav-links a {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .nav-links a:hover { color: var(--accent); text-decoration: none; }
+  @media (max-width: 640px) {
+    .nav-links { gap: 12px; }
+    .nav-links a { font-size: 13px; }
+  }
+</style>

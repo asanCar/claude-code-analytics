@@ -1,0 +1,53 @@
+---
+const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
+---
+<section class="hero" id="top">
+  <div class="container hero-inner">
+    <h1>Local analytics for Claude Code</h1>
+    <p class="lede">PostgreSQL + Grafana, all on your machine. No cloud, no telemetry.</p>
+    <p class="cta-row">
+      <a class="btn-primary" href={repoUrl} target="_blank" rel="noopener">View on GitHub</a>
+      <a class="btn-secondary" href="#dashboards">See the dashboards</a>
+    </p>
+    <pre class="terminal" aria-label="Quick start command">
+<span class="prompt">$</span> ./scripts/up.sh</pre>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 80px 0 48px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lede {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin: 0 0 24px;
+    max-width: 640px;
+  }
+  .cta-row { margin: 0 0 32px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .btn-primary { background: var(--accent); color: var(--bg); }
+  .btn-primary:hover { background: var(--accent-strong); color: #fff; text-decoration: none; }
+  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+  .terminal {
+    background: #000;
+    color: var(--accent);
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    overflow-x: auto;
+    margin: 0;
+    max-width: 480px;
+  }
+  .prompt { color: var(--text-muted); user-select: none; margin-right: 8px; }
+</style>
