@@ -1,0 +1,70 @@
+---
+const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
+const steps = [
+  { label: 'Configure', cmd: 'cp .env.example .env' },
+  { label: 'Start', cmd: './scripts/up.sh' },
+  { label: 'Open Grafana', cmd: 'open http://localhost:3000' },
+];
+---
+<section class="setup" id="setup">
+  <div class="container">
+    <h2>Quick start</h2>
+    <p class="muted">Three commands. Full instructions in the README.</p>
+    <ol class="steps">
+      {steps.map((s, i) => (
+        <li>
+          <span class="step-num">{i + 1}</span>
+          <div>
+            <div class="step-label">{s.label}</div>
+            <code class="step-cmd">{s.cmd}</code>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p><a href={`${repoUrl}#quick-start`} target="_blank" rel="noopener">Full instructions in the README →</a></p>
+  </div>
+</section>
+
+<style>
+  .setup { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  .steps {
+    list-style: none;
+    margin: 24px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 640px;
+  }
+  .steps li {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .step-num {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .step-label { font-weight: 600; font-size: 13px; color: var(--text); }
+  .step-cmd {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    background: transparent;
+  }
+</style>

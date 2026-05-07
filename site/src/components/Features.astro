@@ -1,0 +1,41 @@
+---
+const features = [
+  { title: '100% local', body: 'Runs entirely on your machine. No cloud, no telemetry.' },
+  { title: 'Self-hosted', body: 'Docker Compose stack: PostgreSQL + Grafana + a small scraper.' },
+  { title: 'Open source', body: 'MIT licensed. Inspect, fork, modify.' },
+  { title: 'Real data', body: 'Reads your existing ~/.claude session JSONL. No re-instrumentation.' },
+];
+---
+<section class="features" id="features">
+  <div class="container">
+    <h2>Features</h2>
+    <ul class="grid">
+      {features.map((f) => (
+        <li class="card">
+          <h3>{f.title}</h3>
+          <p class="muted">{f.body}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .features { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  .grid {
+    list-style: none;
+    margin: 24px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .card h3 { margin-bottom: 8px; font-size: 16px; }
+  .card p { margin: 0; font-size: 14px; }
+</style>
