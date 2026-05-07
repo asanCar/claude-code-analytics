@@ -1,0 +1,26 @@
+---
+import type { Dashboard } from '../content/dashboards';
+
+type Props = { dashboard: Dashboard };
+const { dashboard } = Astro.props;
+const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
+const sourceUrl = `${repoUrl}/blob/main/${dashboard.jsonPath}`;
+---
+<article class="dcard">
+  <h3>{dashboard.title}</h3>
+  <p class="question muted"><em>{dashboard.question}</em></p>
+  <p class="meta muted">{dashboard.panels.length} panel{dashboard.panels.length === 1 ? '' : 's'}</p>
+  <a href={sourceUrl} target="_blank" rel="noopener">Source →</a>
+</article>
+
+<style>
+  .dcard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .dcard h3 { font-size: 16px; margin-bottom: 6px; }
+  .question { font-size: 14px; margin-bottom: 12px; }
+  .meta { font-size: 12px; font-family: var(--font-mono); margin-bottom: 12px; }
+</style>

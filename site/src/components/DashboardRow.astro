@@ -1,0 +1,69 @@
+---
+import type { Dashboard } from '../content/dashboards';
+import MediaPlayer from './MediaPlayer.astro';
+
+type Props = { dashboard: Dashboard; index: number };
+const { dashboard, index } = Astro.props;
+const reverse = index % 2 === 1;
+const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
+const sourceUrl = `${repoUrl}/blob/main/${dashboard.jsonPath}`;
+---
+<article class={`row ${reverse ? 'row-reverse' : ''}`} id={dashboard.slug}>
+  <div class="row-text">
+    <h2>{dashboard.title}</h2>
+    <p class="question"><em>{dashboard.question}</em></p>
+    <p>{dashboard.description}</p>
+    <ul class="panels">
+      {dashboard.panels.map((p) => <li>{p}</li>)}
+    </ul>
+    <p><a href={sourceUrl} target="_blank" rel="noopener">Source JSON →</a></p>
+  </div>
+  <div class="row-media">
+    {dashboard.media && (
+      <MediaPlayer
+        poster={dashboard.media.poster}
+        webm={dashboard.media.webm}
+        mp4={dashboard.media.mp4}
+        alt={`${dashboard.title} dashboard demo`}
+      />
+    )}
+  </div>
+</article>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    padding: 64px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .row-reverse .row-text { order: 2; }
+  .row-reverse .row-media { order: 1; }
+
+  .question { color: var(--text-muted); font-size: 18px; margin-bottom: 16px; }
+  .panels {
+    list-style: none;
+    margin: 16px 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .panels li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 800px) {
+    .row { grid-template-columns: 1fr; gap: 24px; padding: 40px 0; }
+    .row-reverse .row-text { order: 0; }
+    .row-reverse .row-media { order: 0; }
+  }
+</style>
