@@ -14,8 +14,6 @@ export type Dashboard = {
   jsonPath: string;
 };
 
-const REPO = 'https://github.com/asanCar/claude-code-analytics';
-
 const mediaFor = (slug: string, base: string) => ({
   poster: `${base}/dashboards/${slug}.png`,
   webm:   `${base}/dashboards/${slug}.webm`,
