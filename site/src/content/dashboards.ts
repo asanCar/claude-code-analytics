@@ -8,8 +8,8 @@ export type Dashboard = {
   featured: boolean;
   media?: {
     poster: string;
-    webm: string;
-    mp4: string;
+    webm?: string;
+    mp4?: string;
   };
   jsonPath: string;
 };
@@ -57,7 +57,7 @@ export const dashboards: Dashboard[] = [
       'Subagent vs Main',
     ],
     featured: true,
-    media: mediaFor('model-usage', BASE),
+    media: { poster: `${BASE}/dashboards/model-usage.png` },
     jsonPath: 'grafana/dashboards/model-usage.json',
   },
   {

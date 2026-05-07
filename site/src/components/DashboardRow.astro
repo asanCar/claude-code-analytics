@@ -5,8 +5,6 @@ import MediaPlayer from './MediaPlayer.astro';
 type Props = { dashboard: Dashboard; index: number };
 const { dashboard, index } = Astro.props;
 const reverse = index % 2 === 1;
-const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
-const sourceUrl = `${repoUrl}/blob/main/${dashboard.jsonPath}`;
 ---
 <article class={`row ${reverse ? 'row-reverse' : ''}`} id={dashboard.slug}>
   <div class="row-text">
@@ -16,7 +14,6 @@ const sourceUrl = `${repoUrl}/blob/main/${dashboard.jsonPath}`;
     <ul class="panels">
       {dashboard.panels.map((p) => <li>{p}</li>)}
     </ul>
-    <p><a href={sourceUrl} target="_blank" rel="noopener">Source JSON →</a></p>
   </div>
   <div class="row-media">
     {dashboard.media && (

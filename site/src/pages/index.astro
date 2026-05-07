@@ -24,14 +24,14 @@ import { featuredDashboards, otherDashboards } from '../content/dashboards';
     <SetupTeaser />
 
     <section id="dashboards">
-      <div class="container">
+      <div class="container-wide">
         <h2 style="padding-top: 64px">Dashboards</h2>
         {featuredDashboards.map((d, i) => (
           <DashboardRow dashboard={d} index={i} />
         ))}
       </div>
 
-      <div class="container" style="padding-top: 32px; padding-bottom: 64px">
+      <div class="container-wide" style="padding-top: 32px; padding-bottom: 64px">
         <h3>Also included</h3>
         <p class="muted">Four more dashboards ship in the stack — demos coming. Click any tile to view its source.</p>
         <div class="other-grid">

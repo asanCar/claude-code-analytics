@@ -1,29 +1,35 @@
 ---
 type Props = {
   poster: string;
-  webm: string;
-  mp4: string;
+  webm?: string;
+  mp4?: string;
   alt: string;
   width?: number;
   height?: number;
 };
 const { poster, webm, mp4, alt, width = 1280, height = 800 } = Astro.props;
+const hasVideo = !!(webm || mp4);
 ---
 <div class="media">
-  <video
-    poster={poster}
-    autoplay
-    loop
-    muted
-    playsinline
-    preload="metadata"
-    width={width}
-    height={height}>
-    <source src={webm} type="video/webm" />
-    <source src={mp4} type="video/mp4" />
-    <img class="fallback" src={poster} alt={alt} />
-  </video>
-  <img class="reduced-motion-poster" src={poster} alt={alt} />
+  {hasVideo ? (
+    <>
+      <video
+        poster={poster}
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        width={width}
+        height={height}>
+        {webm && <source src={webm} type="video/webm" />}
+        {mp4 && <source src={mp4} type="video/mp4" />}
+      </video>
+      <img class="reduced-motion-poster" src={poster} alt={alt} />
+    </>
+  ) : (
+    <img class="static-poster" src={poster} alt={alt} />
+  )}
 </div>
 
 <style>
@@ -35,7 +41,8 @@ const { poster, webm, mp4, alt, width = 1280, height = 800 } = Astro.props;
     line-height: 0;
   }
   .media video,
-  .media .reduced-motion-poster {
+  .media .reduced-motion-poster,
+  .media .static-poster {
     width: 100%;
     height: auto;
     display: block;

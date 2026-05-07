@@ -3,14 +3,11 @@ import type { Dashboard } from '../content/dashboards';
 
 type Props = { dashboard: Dashboard };
 const { dashboard } = Astro.props;
-const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
-const sourceUrl = `${repoUrl}/blob/main/${dashboard.jsonPath}`;
 ---
 <article class="dcard">
   <h3>{dashboard.title}</h3>
   <p class="question muted"><em>{dashboard.question}</em></p>
   <p class="meta muted">{dashboard.panels.length} panel{dashboard.panels.length === 1 ? '' : 's'}</p>
-  <a href={sourceUrl} target="_blank" rel="noopener">Source →</a>
 </article>
 
 <style>
