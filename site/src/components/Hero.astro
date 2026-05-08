@@ -5,6 +5,7 @@ const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
   <div class="container hero-inner">
     <h1>Local analytics for Claude Code</h1>
     <p class="lede">PostgreSQL + Grafana, all on your machine. No cloud, no telemetry.</p>
+    <p class="disclaimer">macOS only for now — depends on launchd and the macOS Keychain.</p>
     <p class="cta-row">
       <a class="btn-primary" href={repoUrl} target="_blank" rel="noopener">View on GitHub</a>
       <a class="btn-secondary" href="#dashboards">See the dashboards</a>
@@ -22,7 +23,15 @@ const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
   .lede {
     font-size: 18px;
     color: var(--text-muted);
+    margin: 0 0 12px;
+    max-width: 640px;
+  }
+  .disclaimer {
     margin: 0 0 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-left: 2px solid #facc15;
+    padding-left: 10px;
     max-width: 640px;
   }
   .cta-row { margin: 0 0 32px; display: flex; gap: 12px; flex-wrap: wrap; }

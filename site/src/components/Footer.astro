@@ -1,8 +1,13 @@
 ---
 const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
+const year = 2026;
 ---
 <footer class="footer">
   <div class="container footer-inner">
+    <span>&copy; {year}</span>
+    <span class="sep">·</span>
+    <a href={`${repoUrl}/blob/main/LICENSE`} target="_blank" rel="noopener">MIT License</a>
+    <span class="sep">·</span>
     <a href={repoUrl} target="_blank" rel="noopener">GitHub</a>
   </div>
 </footer>
@@ -12,10 +17,15 @@ const repoUrl = 'https://github.com/asanCar/claude-code-analytics';
     padding: 32px 0;
     color: var(--text-muted);
     font-size: 14px;
+    border-top: 1px solid var(--border);
   }
   .footer-inner {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    flex-wrap: wrap;
+    text-align: center;
   }
+  .sep { color: var(--text-muted); }
 </style>

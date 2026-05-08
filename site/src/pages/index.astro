@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import Features from '../components/Features.astro';
+import Tooltips from '../components/Tooltips.astro';
 import SetupTeaser from '../components/SetupTeaser.astro';
 import Footer from '../components/Footer.astro';
 import DashboardRow from '../components/DashboardRow.astro';
@@ -30,13 +31,19 @@ import { featuredDashboards, otherDashboards } from '../content/dashboards';
           <DashboardRow dashboard={d} index={i} />
         ))}
       </div>
+    </section>
 
-      <div class="container-wide" style="padding-top: 32px; padding-bottom: 64px">
-        <h3>Also included</h3>
-        <p class="muted">Four more dashboards ship in the stack — demos coming. Click any tile to view its source.</p>
+    <section id="also-included">
+      <div class="container-wide" style="padding-top: 32px; padding-bottom: 64px; border-top: 1px solid var(--border)">
+        <h2 style="padding-top: 32px">Also included</h2>
+
+        <h3 style="margin-top: 32px">Additional dashboards</h3>
+        <p class="muted">Four more dashboards ship in the stack.</p>
         <div class="other-grid">
           {otherDashboards.map((d) => <DashboardCard dashboard={d} />)}
         </div>
+
+        <Tooltips />
       </div>
     </section>
 
