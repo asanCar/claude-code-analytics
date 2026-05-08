@@ -38,11 +38,13 @@ The agent runs `scripts/sync-token.sh` at load and every 60 seconds. Logs go to
 > come up automatically on every login.
 
 A launchd agent runs `scripts/up.sh` at login, waiting up to 5 minutes for
-Docker to become available before bringing the stack up. The install script
-renders `scripts/com.claude-code-analytics.up.plist.tmpl` with your project
-path and the absolute path to `docker` from your `PATH`, copies the result
-to `~/Library/LaunchAgents/`, and loads it. Logs go to
-`/tmp/claude-code-analytics-up.log`.
+Docker to become available before bringing the stack up.
+
+The install script renders `scripts/com.claude-code-analytics.up.plist.tmpl`
+with your project path and the absolute path to `docker` from your `PATH`,
+copies the result to `~/Library/LaunchAgents/`, and loads it.
+
+Logs go to `/tmp/claude-code-analytics-up.log`.
 
 **Install:**
 
