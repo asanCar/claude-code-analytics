@@ -33,18 +33,27 @@
     },
     {
       "type": "link",
-      "title": "Weekly Workflow Trends",
-      "tooltip": "Long-window trends and week-over-week deltas",
-      "url": "/d/weekly-workflow/",
+      "title": "Model Usage",
+      "tooltip": "Token volume split across Claude models, with per-project and main vs subagent breakdowns",
+      "url": "/d/model-usage/",
       "icon": "external link",
       "targetBlank": false,
       "keepTime": false
     },
     {
       "type": "link",
-      "title": "Cache Efficiency",
-      "tooltip": "How much of Claude's context is being reused via cache",
-      "url": "/d/cache-efficiency/",
+      "title": "Prompt Cost Ranking",
+      "tooltip": "Most expensive prompts, sessions, and tools",
+      "url": "/d/prompt-cost/",
+      "icon": "external link",
+      "targetBlank": false,
+      "keepTime": false
+    },
+    {
+      "type": "link",
+      "title": "Weekly Workflow Trends",
+      "tooltip": "Long-window trends and week-over-week deltas",
+      "url": "/d/weekly-workflow/",
       "icon": "external link",
       "targetBlank": false,
       "keepTime": false

@@ -15,7 +15,7 @@
     }
   ],
   "schemaVersion": 39,
-  "tags": ["claude-code"],
+  "tags": ["claude-code", "WIP"],
   "time": {"from": "now-7d", "to": "now"},
   "timepicker": {},
   "timezone": "browser",
