@@ -8,7 +8,7 @@ Local monitoring stack for Claude Code token usage. Ingests session JSONL files 
 
 1. Copy `.env.example` to `.env` and fill in values
 2. Bring up the stack: `./scripts/up.sh` (installs the token-sync launchd agent and starts containers)
-3. Open Grafana at http://localhost:3000 (default: admin/admin)
+3. Open Grafana at http://localhost:3808 (default: admin/admin)
 4. Tear everything down with `./scripts/down.sh`
 
 ## Configuration

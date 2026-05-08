@@ -38,7 +38,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       GF_USERS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards-summary/summary.json
     ports:
-      - "3000:3000"
+      - "3808:3000"
     depends_on:
       postgres:
         condition: service_healthy
