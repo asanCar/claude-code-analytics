@@ -37,30 +37,23 @@ The agent runs `scripts/sync-token.sh` at load and every 60 seconds. Logs go to
 > Not installed by `up.sh`. Set this up yourself only if you want the stack to
 > come up automatically on every login.
 
-`scripts/com.claude-code-analytics.up.plist` is a launchd agent that runs
-`scripts/up.sh` at login, waiting up to 5 minutes for Docker to become
-available before bringing the stack up.
-
-The plist ships with example paths and must be edited before use:
-
-| Field | Path | Adjust if |
-|-------|------|-----------|
-| `ProgramArguments` (line 11) | `/cloned/path/claude-code-analytics/scripts/up.sh` | Set to the path where you cloned the project |
-| `ProgramArguments` (line 11) | `/opt/homebrew/bin/docker` | Using Intel Mac (`/usr/local/bin/docker`) |
-| `EnvironmentVariables` → `PATH` | Includes `/opt/homebrew/bin` | Using Intel Mac (replace with `/usr/local/bin`) |
+A launchd agent runs `scripts/up.sh` at login, waiting up to 5 minutes for
+Docker to become available before bringing the stack up.
 
 Install:
 
 ```bash
-cp scripts/com.claude-code-analytics.up.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.claude-code-analytics.up.plist
+./scripts/install-autostart.sh
 ```
+
+The script renders `scripts/com.claude-code-analytics.up.plist.tmpl` with
+your project path and the absolute path to `docker` from your `PATH`, copies
+the result to `~/Library/LaunchAgents/`, and loads it.
 
 Remove:
 
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.claude-code-analytics.up.plist
-rm ~/Library/LaunchAgents/com.claude-code-analytics.up.plist
+./scripts/uninstall-autostart.sh
 ```
 
 Logs go to `/tmp/claude-code-analytics-up.log`.
