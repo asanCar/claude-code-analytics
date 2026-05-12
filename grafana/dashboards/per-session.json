@@ -160,7 +160,7 @@
     },
     {
       "type": "table",
-      "title": "Prompt List",
+      "title": "Prompt History",
       "description": "Chronological message log for the selected session. Shows each prompt/response with its token cost.",
       "id": 1,
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 14},

@@ -84,10 +84,10 @@ export const dashboards: Dashboard[] = [
     audience: 'detail',
     question: 'What happened inside one specific session?',
     description:
-      "Drill into one session: the full prompt list, message-type breakdown, token totals across input/output/cache-read, the timeline, and the archetype mix. Click a session row to filter the rest of the dashboard.",
+      "Drill into one session: the full prompt history, message-type breakdown, token totals across input/output/cache-read, the timeline, and the archetype mix. Click a session row to filter the rest of the dashboard.",
     panels: [
       'Sessions (click a session_id to filter)',
-      'Prompt List',
+      'Prompt History',
       'Total Input Tokens',
       'Total Output Tokens',
       'Total Cache Read Tokens',
